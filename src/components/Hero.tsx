@@ -2,8 +2,9 @@
 
 import { motion } from "framer-motion"
 import { LuDownload } from "react-icons/lu"
-import { socialLinks } from "@/app/lib/contants"
+import { socialLinks, stats } from "@/app/lib/contants"
 import Image from "next/image"
+import CountUp from "./CountUp"
 
 export default function Hero() {
     return (
@@ -32,7 +33,7 @@ export default function Hero() {
                                     download
                                     whileHover={{scale: 1.05}}
                                     whileTap={{scale: 0.95}}
-                                    className="w-full lg:w-auto bg-emerald-400 text-shadow-gray-900 py-3 rounded-full flex items-center justify-center gap-2 p-5 hover:bg-emerald-300"
+                                    className="w-full lg:w-auto bg-emerald-400 text-shadow-gray-900 py-3 rounded-full flex items-center justify-center gap-2 px-6 hover:bg-emerald-300"
                                 >
                                     <LuDownload size={20} />
                                     Download
@@ -117,6 +118,24 @@ export default function Hero() {
             
                     </motion.div>
                 </div>
+
+            <motion.div 
+                initial={{opacity:0, y:20}}
+                animate={{opacity:1, y:0}}
+                transition={{delay:0.5}}
+                className="grid grid-cols-2 md:grid-cols-4 gap8 mt-20"
+            >
+                {stats.map((stat,index) => (
+                    <div key={index} className="flex items-center gap-4">
+                        <h2 className="text-4xl font-bold text-emerald-400">
+                            <CountUp value={Number(stat.number)}></CountUp>
+                        </h2>
+                        <p className="text-gray-400 text-sm">
+                            {stat.text}
+                        </p>
+                    </div>
+                ))}
+            </motion.div>
             </div>
         </section>
     )
