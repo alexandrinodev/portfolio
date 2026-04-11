@@ -12,8 +12,8 @@ export default function NavBar() {
     const [isMenuOpen, setIsMenuOpen] = useState(false)
 
     return (
-        <nav className="fixed w-full z-50 bg-gray-950/80 backdrop-blur-sm">
-            <div className="w-full max-w-5xl mx-auto px-4 sm:px-6 max-sm:px-3">
+        <nav className="fixed w-full z-50 bg-gray-950/80 backgrop-blur-sm">
+            <div className="w-full max-w-5xl mx-auto px-4 sm:px-6">
                 <div className="flex items-center justify-between h-16">
                     <Link href="/">
                         <motion.div
@@ -76,14 +76,14 @@ export default function NavBar() {
                         duration: 0.4,
                         ease: "easeOut"
                     }}
-                    className="md:hidden bg-gray-900 px-4 py-4"
+                    className="md:hidden bg-gray-900 -px-6 py-4"
 
                 >
                     {menuItems.map((item, index) => (
                         <Link
                             key={index}
                             href={item.path}
-                            className={`block py-6 w-full 
+                            className={`block py-6 px-6 w-full
                                         ${pathname === item.path ? "text-emerald-400" : "text-gray-300"}`}
                             onClick={() => setIsMenuOpen(false)}
                         >

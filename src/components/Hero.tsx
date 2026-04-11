@@ -69,7 +69,7 @@ export default function Hero() {
                         }}
                         className="relative flex-1"
                     >
-                        <div className="w-[350px] - h-[350px] relative mx-auto">
+                        <div className="w-[350px] - h-[350px] relative mx-auto overflow-hidden">
                             <motion.div 
                                 animate={{
                                     rotate: 360,
@@ -105,7 +105,7 @@ export default function Hero() {
                                     ease: 'linear',
                                     repeat: Infinity
                                 }}
-                                className="absolute top-2 left-0 w-full border-b-2 border-dashed border-emerald-400/5"
+                                className="absolute top-2 left-0 w-full border-b-2 border-dashed border-emerald-400/5 overflow-hidden"
                             />
 
                             <Image
