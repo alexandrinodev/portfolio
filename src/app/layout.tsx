@@ -1,5 +1,6 @@
 import { JetBrains_Mono } from "next/font/google"
 import "./globals.css";
+import NavBar from "@/components/NavBar";
 
 
 const jetbrainsMono = JetBrains_Mono({
@@ -16,6 +17,7 @@ export default function RootLayout({
   return (
     <html lang="en">
         <body className={jetbrainsMono.className}>
+          <NavBar />
           <main className="min-h-screen">
             {children}
             </main>

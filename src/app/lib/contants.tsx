@@ -13,3 +13,11 @@ export const stats = [
     { number: "10", text: "Tecnologias Dominadas"},
     { number: "500", text: "Commits de Códigos"},
 ]
+
+export const menuItems = [
+    {title: "Home", path: "/"},
+    {title: "Serviços", path: "/services"},
+    {title: "Resumo", path: "/resume"},
+    {title: "Projetos", path: "/work"},
+    {title: "Contato", path: "/contact"},
+]
