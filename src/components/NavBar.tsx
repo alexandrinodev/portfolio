@@ -13,7 +13,7 @@ export default function NavBar() {
 
     return (
         <nav className="fixed w-full z-50 bg-gray-950/80 backgrop-blur-sm">
-            <div className="w-full max-w-5xl mx-auto px-4 sm:px-6">
+            <div className="w-full max-w-6xl mx-auto px-4 sm:px-6">
                 <div className="flex items-center justify-between h-16">
                     <Link href="/">
                         <motion.div

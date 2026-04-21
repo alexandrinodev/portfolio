@@ -53,3 +53,64 @@ export const services = [
         features: ["Core Web Vitals", "SEO On-Page"]
     },
 ]
+
+export const ExperienceTabs = [
+    {title: "Experiências", id: "experiencias"},
+    {title: "Educação", id: "educacao"},
+    {title: "Habilidades", id: "skills"},
+    {title: "Sobre mim", id: "about"},
+]
+
+export const resumeData = {
+    experience: [
+        {
+            period: "2025 - Present",
+            title: "Software Engineer",
+            company: "Sidia Instituto de Ciência e Tecnologia - SIDIA",
+            description: "Desenvolvimento de aplicações usando Nextjs, Javascript, Node.JS, Python, Go"
+        },
+        {
+            period: "2022 - 2025",
+            title: "Test Developer Jr.",
+            company: "Sidia Instituto de Ciência e Tecnologia - SIDIA",
+            description: "Testes de compatbilidade, caixa preta, regressao"
+        },
+    ],
+    education: [
+        {
+            period:"2017 - 2020",
+            title: "Ciência da Computação",
+            institution: "UNINORTE",
+            description: "Bacharelado com foco em desenvolvimento web"
+        }
+    ],
+    skills: [
+        {name: "Frontend", items: ["React", "Next.js", "TypeScript"]},
+        {name: "Backend", items: ["Node.js", "Python", "Postgress", "MongoDB"]},
+        {name: "DevOps", items: ["Git", "Docker", "Kubernets", "CI/CD"]},
+        {name: "Soft Skills", items: ["Comunicação", "Liderança", "Trabalho em Equipe"]},
+    ],
+    about: {
+        description: "Desenvolvedor Full Stack apaixonado por criar soluçlões inovadoras e escaláveis. Experência em desenvolivmento web moderno e práticas ágeis",
+        interests: ["Open Source", "UI/UX Design", "Cloud Computing", "Machine Learning"]
+    }
+}
+
+export const skillsData = [
+    { name: "HTML5", icon: "/icons/html5.svg" },
+    { name: "React", icon: "/icons/react.svg" },
+    { name: "Next.js", icon: "/icons/nextjs.svg" },
+    { name: "TypeScript", icon: "/icons/typescript.svg" },
+
+    // Backend
+    { name: "Node.js", icon: "/icons/nodejs.svg" },
+    { name: "Python", icon: "/icons/python.svg" },
+    { name: "PostgreSQL", icon: "/icons/postgres.svg" },
+    { name: "MongoDB", icon: "/icons/mongodb.svg" },
+
+    // DevOps
+    { name: "Git", icon: "/icons/git.svg" },
+    { name: "Docker", icon: "/icons/docker.svg" },
+    { name: "Kubernetes", icon: "/icons/kubernets.svg" },
+    { name: "CI/CD", icon: "/icons/cicd.svg" },
+]

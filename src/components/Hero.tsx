@@ -9,7 +9,7 @@ import CountUp from "./CountUp"
 export default function Hero() {
     return (
         <section className="min-h-screen bg-gray-950 text-white pt-20">
-            <div className="max-w-3xl mx-auto px-6 py-12">
+            <div className="max-w-6xl mx-auto px-6 py-12">
                 <div className="flex flex-col-reverse lg:flex-row items-center justify-between gap-8 lg:gap-16">
                     <motion.div
                         initial={{opacity: 0 , y: 20}}
