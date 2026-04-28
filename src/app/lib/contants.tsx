@@ -1,3 +1,4 @@
+import { Mail, MapPin, Phone } from 'lucide-react'
 import { FaPallet } from 'react-icons/fa'
 import { LuFileCode2, LuGithub, LuInstagram, LuLinkedin, LuPenTool, LuSearch, LuYoutube } from 'react-icons/lu'
 
@@ -113,4 +114,55 @@ export const skillsData = [
     { name: "Docker", icon: "/icons/docker.svg" },
     { name: "Kubernetes", icon: "/icons/kubernets.svg" },
     { name: "CI/CD", icon: "/icons/cicd.svg" },
+]
+
+export const projectsData = [
+    {
+        number: "01",
+        title: "Hardware Detection Agent",
+        description: "Um agente desktop robusto que detecta componentes de hardware em tempo real e envia os dados para um dashboard centralizado.",
+        image: "/projects/hardware-agent.png",
+        technologies: ["Electron", "Node.js", "JavaScript", "Python"],
+        demoLink: "https://seu-demo-link.com", // Opcional se for ferramenta interna
+        githubLink: "https://github.com/alexandrinodev" 
+    },
+    {
+        number: "02",
+        title: "QA Automation Dashboard",
+        description: "Plataforma para monitoramento de testes automatizados e valnumberação de sistema, otimizando o workflow de Quality Assurance.",
+        image: "/projects/qa-dashboard.png",
+        technologies: ["React", "Next.js", "MongoDB", "RabbitMQ"],
+        demoLink: "https://seu-demo-link.com",
+        githubLink: "https://github.com/alexandrinodev"
+    },
+    {
+        number: "03",
+        title: "Fullstack E-commerce API",
+        description: "API escalável com integração de filas para processamento de pedidos e gerenciamento de estoque em tempo real.",
+        image: "/projects/api-backend.png",
+        technologies: ["FastAPI", "Python", "PostgreSQL", "Docker"],
+        demoLink: "https://api-docs-link.com",
+        githubLink: "https://github.com/alexandrinodev"
+    }
+];
+
+export const contactInfo = [
+    {
+        icon: <Phone className='w-2 h-6'/>,
+        title: "Phone",
+        content: "(92) 98449-4933",
+        bg: "bg-emerald-400/10"
+    },
+    {
+        icon: <Mail className='w-2 h-6'/>,
+        title: "Email",
+        content: "alexbrunoalexandrino@gmail.com",
+        bg: "bg-emerald-400/10"
+    },
+    {
+        icon: <MapPin className='w-2 h-6'/>,
+        title: "Address",
+        content: "Manaus - AM",
+        bg: "bg-emerald-400/10"
+    },
 ]

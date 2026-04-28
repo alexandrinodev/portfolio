@@ -6,7 +6,7 @@ import { useState } from 'react'
 
 export default function Resume() {
 
-    const [activateTab, SetActivateTab] = useState("experience")
+    const [activateTab, SetActivateTab] = useState("experiencias")
     const renderContent = () => {
         switch(activateTab){
             case "experiencias":
