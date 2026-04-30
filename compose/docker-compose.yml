@@ -1,0 +1,7 @@
+services:
+  app:
+    container_name: portfolio_frontend
+    image: frontend:latest
+    ports:
+      - "3000:3000"
+    restart: always
