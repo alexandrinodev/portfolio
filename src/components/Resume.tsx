@@ -1,11 +1,12 @@
 "use client"
-import { ExperienceTabs, resumeData, skillsData } from '@/app/lib/contants'
+import { ExperienceTabs, resumeData, skillsData } from '@/app/lib/constants'
 import { AnimatePresence, motion } from 'framer-motion'
 import Image from 'next/image'
 import { useState } from 'react'
+import { useLanguage } from '@/app/i18n/LanguageContext'
 
 export default function Resume() {
-
+    const { t } = useLanguage()
     const [activateTab, SetActivateTab] = useState("experiencias")
     const renderContent = () => {
         switch(activateTab){
@@ -93,12 +94,12 @@ export default function Resume() {
                         className='grid md:grid-cols-2 gap-8'
                     >
                         <div className='bg-gray-900 p-6 rounded-xl'>
-                            <h3 className='text-xl font-bold mb-4'>Sobre min</h3>
-                            <p className='text-gray-400'>{resumeData.about.description}</p>
+                            <h3 className='text-xl font-bold mb-4'>{t.experience.aboutMe}</h3>
+                            <p className='text-gray-400'>{t.resume.about.description}</p>
                         </div>
                         <div className='bg-gray-900 p-6 rounded-xl'>
                             <h3 className='text-xl font-bold mb-4'>Interesses</h3>
-                            <div className='flex flex-wrap gap-2'>{resumeData.about.interests.map((interest,index) => (
+                            <div className='flex flex-wrap gap-2'>{t.resume.about.interests.map((interest,index) => (
                                 <span 
                                     key={index}
                                     className='px-3 py-1 bg-gray-800 text-emerald-400 rounded-full
@@ -123,12 +124,12 @@ export default function Resume() {
 
                     {/* sidebar */}
                     <div className=" space-y-4">
-                        <motion.h2
+<motion.h2
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
                             className="text-3xl font-bold mb-8"
                         >
-                            Por que me contratar?
+                            {t.nav.hireMe}
                         </motion.h2>
 
                         <div className='space-y-2'>
@@ -145,7 +146,10 @@ export default function Resume() {
                                             : "bg-gray-900 text-gray-400 hover:text-white"
                                         }`}
                                 >
-                                    {tab.title}
+                                    {index === 0 ? t.experience.experiences :
+                                     index === 1 ? t.experience.education :
+                                     index === 2 ? t.experience.skills :
+                                     t.experience.aboutMe}
                                 </motion.button>
                             ))}
                         </div>

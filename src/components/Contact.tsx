@@ -3,8 +3,9 @@ import { useState } from "react"
 import { useForm } from "react-hook-form"
 import emailjs from "@emailjs/browser"
 import {motion} from "framer-motion"
-import { contactInfo } from "@/app/lib/contants"
+import { contactInfo } from "@/app/lib/constants"
 import { Send } from "lucide-react"
+import { useLanguage } from "@/app/i18n/LanguageContext"
 
 type FormData = {
     firstName: string
@@ -16,7 +17,7 @@ type FormData = {
 }
 
 export default function Contact(){
-
+    const { t } = useLanguage()
     const [isSubmitting, setIsSubmitting] = useState(false)
     const {register, handleSubmit, formState, reset} = useForm<FormData>()
 
@@ -50,45 +51,45 @@ export default function Contact(){
                         className=" bg-gray-900/50 p-8 rounded-2xl lg:order-1"
                     >
                         <h2 className="text-3xl font-bold text-emerald-400 mb-4">
-                            Vamos Trablhar Juntos!
+                            {t.nav.hireMe}
                         </h2>
-                        <p className="text-gray-400 mb-8">Lorem ipsum dolor, sit amet consectetur adipisicing elit. Dolore iusto soluta laboriosam quasi laborum. Esse, dicta exercitationem ex cupiditate sequi in veniam quasi officia dolorum fugiat ad. Nobis, quis non!</p>
+                        <p className="text-gray-400 mb-8">{t.hero.description}</p>
 
                         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
                             <div className="grid grid-cols-2 gap-4">
                                 <div>
                                     <input 
                                         {...register("firstName", {required: true})}
-                                        placeholder="Nome"
+                                        placeholder={t.contact["first-name"]}
                                         className="w-full bg-gray-800 rounded-lg p-3 text-white border border-gray-700 focus:border-emerald-400 focus:outline-none"
                                         
                                     />
                                     {formState.errors.firstName && 
-                                        <span className="text-red-500"> Nome é obrigatório</span>
+                                        <span className="text-red-500"> {t.contact["first-name-required"]}</span>
                                     }
                                 </div>
                                 <div>
                                     <input 
                                         {...register("lastName", {required: true})}
-                                        placeholder="Sobrenome"
+                                        placeholder={t.contact["last-name"]}
                                         className="w-full bg-gray-800 rounded-lg p-3 text-white border border-gray-700 focus:border-emerald-400 focus:outline-none"
                                         
                                     />
                                     {formState.errors.lastName && 
-                                        <span className="text-red-500"> Sobrenome é obrigatório</span>
+                                        <span className="text-red-500"> {t.contact["last-name-required"]}</span>
                                     }
                                 </div>
                             </div>
 
                             <input
                                 {...register("email", {required: true, pattern: /^\S+@\S+$/i})}
-                                placeholder="Endereço de email"
+                                placeholder={t.contact["email-address"]}
                                 className="w-full bg-gray-800 rounded-lg p-3 text-white border border-gray-700 focus:border-emerald-400 focus:outline-none"
                             />
 
                             <input
                                 {...register("phone")}
-                                placeholder="Número de telefone"
+                                placeholder={t.contact["phone-number"]}
                                 className="w-full bg-gray-800 rounded-lg p-3 text-white border border-gray-700 focus:border-emerald-400 focus:outline-none"
                             />
 
@@ -96,16 +97,16 @@ export default function Contact(){
                                 {...register("service")}
                                 className="w-full bg-gray-800 rounded-lg p-3 text-white border border-gray-700 focus:border-emerald-400 focus:outline-none"
                             >
-                                <option value="">Selecione um serviço</option>
-                                <option value="web">Desenvolvimento Web</option>
-                                <option value="backend">Desenvolvimento Backend</option>
-                                <option value="fullstack">Desenvolvimento FullStack</option>
+                                <option value="">{t.contact["select-service"]}</option>
+                                <option value="web">{t.services.webDev.title}</option>
+                                <option value="backend">{t.services.uiux.title}</option>
+                                <option value="fullstack">{t.services.branding.title}</option>
                             </select>
 
 
                             <textarea
                                 {...register("message", {required: true})}
-                                placeholder="Digite sua mensagem aqui"
+                                placeholder={t.contact["type-message"]}
                                 rows={6}
                                 className="w-full bg-gray-800 rounded-lg p-3 text-white border border-gray-700 focus:border-emerald-400 focus:outline-none"
 
@@ -120,7 +121,7 @@ export default function Contact(){
                                 font-medium hover:bg-emerald-300 transition-colors disabled:opacity-50 flex items-center gap-2
                                 "
                             >
-                                {isSubmitting ? "Enviando..." : "Enviar Mensagem"}
+                                {isSubmitting ? "Sending..." : `${t.contact["button-send"]}`}
 
                                 <Send size={20}/>
                             </motion.button>
@@ -145,7 +146,7 @@ export default function Contact(){
                                     {info.icon}
                                 </div>
                                 <div>
-                                    <h3 className="text-gray-400 mb-1">{info.title}</h3>
+                                    <h3 className="text-gray-400 mb-1">{index === 0 ? t.contact.phone : index === 1 ? t.contact.email : t.contact.address}</h3>
                                     <p className="text-xl">{info.content}</p>
                                 </div>
 

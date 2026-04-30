@@ -3,11 +3,13 @@ import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { useState } from "react"
 import { motion } from "framer-motion"
-import { menuItems } from "@/app/lib/contants"
+import { menuItems } from "@/app/lib/constants"
 import { Menu, X } from "lucide-react"
+import LanguageToggle from "./LanguageToggle"
+import { useLanguage } from "@/app/i18n/LanguageContext"
 
 export default function NavBar() {
-
+    const { t } = useLanguage()
     const pathname = usePathname()
     const [isMenuOpen, setIsMenuOpen] = useState(false)
 
@@ -28,17 +30,21 @@ export default function NavBar() {
                     {/* Menu Desktop */}
                     <div className="hidden md:flex items-center space-x-8">
                         {menuItems.map((item, index) => (
-                            <motion.div 
+                            <motion.div
                                 key={index}
-                                whileHover={{y:-2}}
-                                whileTap={{scale: 0.95}}
+                                whileHover={{ y: -2 }}
+                                whileTap={{ scale: 0.95 }}
                             >
-                                <Link 
+                                <Link
                                     href={item.path}
                                     className={`${pathname === item.path ? "text-emerald-400" : "text-gray-400"} 
                                                 hover:text-emerald-400 transition-colors relative group:`}
                                 >
-                                    {item.title}
+                                    {index === 0 ? t.nav.home :
+                                        index === 1 ? t.nav.services :
+                                            index === 2 ? t.nav.resume :
+                                                index === 3 ? t.nav.work :
+                                                    t.nav.contact}
                                     {pathname === item.path && (
                                         <span className="absolute -bottom-1 left-0 w-full h-0.5 bg-emerald-400" />
                                     )}
@@ -46,13 +52,15 @@ export default function NavBar() {
                             </motion.div>
                         ))}
 
+                        <LanguageToggle />
+
                         <motion.button
-                            whileHover={{scale: 1.05}}
-                            whileTap={{scale:0.95}}
+                            whileHover={{ scale: 1.05 }}
+                            whileTap={{ scale: 0.95 }}
                             className="bg-emerald-400 text-gray-900 px-6 py-2 rounded-full
-                            font-medium hover:bg-emerald-300 transition-colors" 
+                            font-medium hover:bg-emerald-300 transition-colors"
                         >
-                            Me Contrate
+                            {t.nav.hireMe}
                         </motion.button>
                     </div>
 

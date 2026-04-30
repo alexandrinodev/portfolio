@@ -1,24 +1,31 @@
 'use client'
-import { projectsData } from "@/app/lib/contants";
+import { projectsData } from "@/app/lib/constants";
 import { AnimatePresence, motion } from "framer-motion";
 import { ArrowUpRight, ChevronLeft, ChevronRight } from "lucide-react";
 import Image from "next/image";
 import { useState } from "react";
 import { FaGithub } from "react-icons/fa6";
+import { useLanguage } from "@/app/i18n/LanguageContext";
 
 export default function Work() {
-
+    const { t } = useLanguage()
+    const projects = [
+        { ...projectsData[0], ...t.projects.hardware },
+        { ...projectsData[1], ...t.projects.qa },
+        { ...projectsData[2], ...t.projects.ecommerce }
+    ]
+    
     const [currentIndex, SetCurrentIndex] = useState(0)
 
     const nextProject = () => {
-        SetCurrentIndex((prev) => (prev + 1) % projectsData.length)
+        SetCurrentIndex((prev) => (prev + 1) % projects.length)
     }
 
     const prevProject = () => {
-        SetCurrentIndex((prev) => (prev - 1 + projectsData.length) % projectsData.length)
+        SetCurrentIndex((prev) => (prev - 1 + projects.length) % projects.length)
     }
 
-    const project = projectsData[currentIndex]
+    const project = projects[currentIndex]
 
     return (
         <section className="min-h-screen bg-gray-900 text-white pt-10">

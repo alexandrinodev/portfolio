@@ -1,0 +1,113 @@
+{
+  "nav": {
+    "home": "Home",
+    "services": "Serviços",
+    "resume": "Resumo",
+    "work": "Projetos",
+    "contact": "Contato",
+    "hireMe": "Me Contrate"
+  },
+  "hero": {
+    "role": "Desenvolvedor Full Stack",
+    "greeting": "Olá, Eu sou",
+    "name": "Alex Bruno",
+    "description": "Focado em construir interfaces elegantes e sistemas eficientes. Especialista em unir design intuitivo com arquiteturas de software sólidas.",
+    "download": "Download CV"
+  },
+  "stats": {
+    "yearsExperience": "Anos de Experiência",
+    "projects": "Projetos",
+    "technologies": "Tecnologias Dominadas",
+    "commits": "Commits de Códigos"
+  },
+  "services": {
+    "webDev": {
+      "title": "Desenvolvedor Web",
+      "description": "Criação de sites modernos, responsivos e de alta performance utilizando as tecnologias mais recentes do mercado.",
+      "features": ["React & Next.js", "SPAs e Landing Pages"]
+    },
+    "uiux": {
+      "title": "UI/UX Design",
+      "description": "Desenvolvimento de interfaces intuitivas e centradas no usuário para garantir a melhor experiência de navegação.",
+      "features": ["Prototipagem no Figma", "Design Responsivo"]
+    },
+    "branding": {
+      "title": "Branding & Identidade",
+      "description": "Criação de elementos visuais únicos que comunicam a essência da sua marca e conectam com seu público-alvo.",
+      "features": ["Logotipos", "Guia de Estilo"]
+    },
+    "seo": {
+      "title": "Otimização de SEO",
+      "description": "Aplicação de técnicas avançadas para melhorar o rankeamento do seu site nos motores de busca como o Google.",
+      "features": ["Core Web Vitals", "SEO On-Page"]
+    }
+  },
+  "experience": {
+    "experiences": "Experiências",
+    "education": "Educação",
+    "skills": "Habilidades",
+    "aboutMe": "Sobre mim"
+  },
+  "resume": {
+    "experience": [
+      {
+        "period": "2025 - Present",
+        "title": "Software Engineer",
+        "company": "Sidia Instituto de Ciência e Tecnologia - SIDIA",
+        "description": "Desenvolvimento de aplicações usando Nextjs, Javascript, Node.js, Python, Go"
+      },
+      {
+        "period": "2022 - 2025",
+        "title": "Test Developer Jr.",
+        "company": "Sidia Instituto de Ciência e Tecnologia - SIDIA",
+        "description": "Testes de compatibilidade, caixa preta, regressão"
+      }
+    ],
+    "education": [
+      {
+        "period": "2017 - 2020",
+        "title": "Ciência da Computação",
+        "institution": "UNINORTE",
+        "description": "Bacharelado com foco em desenvolvimento web"
+      }
+    ],
+    "skills": {
+      "frontend": ["React", "Next.js", "TypeScript"],
+      "backend": ["Node.js", "Python", "PostgreSQL", "MongoDB"],
+      "devops": ["Git", "Docker", "Kubernetes", "CI/CD"],
+      "softSkills": ["Comunicação", "Liderança", "Trabalho em Equipe"]
+    },
+    "about": {
+      "description": "Desenvolvedor Full Stack apaixonado por criar soluções inovadoras e escaláveis. Experiência em desenvolvimento web moderno e práticas ágeis.",
+      "interests": ["Open Source", "UI/UX Design", "Cloud Computing", "Machine Learning"]
+    }
+  },
+  "projects": {
+    "hardware": {
+      "title": "Hardware Detection Agent",
+      "description": "Um agente desktop robusto que detecta componentes de hardware em tempo real e envia os dados para um dashboard centralizado."
+    },
+    "qa": {
+      "title": "QA Automation Dashboard",
+      "description": "Plataforma para monitoramento de testes automatizados e validação de sistema, otimizando o workflow de Quality Assurance."
+    },
+    "ecommerce": {
+      "title": "Fullstack E-commerce API",
+      "description": "API escalável com integração de filas para processamento de pedidos e gerenciamento de estoque em tempo real."
+    }
+  },
+  "contact": {
+    "phone": "Telefone",
+    "email": "E-mail",
+    "address": "Endereço",
+    "button-send": "Enviar Mensagem",
+    "first-name": "Nome",
+    "first-name-required": "O nome é obrigatório",
+    "last-name": "Sobrenome",
+    "last-name-required": "O sobrenome é obrigatório",
+    "email-address": "Endereço de e-mail",
+    "phone-number": "Número de telefone",
+    "select-service": "Selecione um serviço",
+    "type-message": "Digite sua mensagem aqui"
+    }
+}

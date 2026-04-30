@@ -2,11 +2,14 @@
 
 import { motion } from "framer-motion"
 import { LuDownload } from "react-icons/lu"
-import { socialLinks, stats } from "@/app/lib/contants"
+import { socialLinks, stats } from "@/app/lib/constants"
 import Image from "next/image"
 import CountUp from "./CountUp"
+import { useLanguage } from "@/app/i18n/LanguageContext"
 
 export default function Hero() {
+    const { t } = useLanguage()
+    
     return (
         <section className="min-h-screen bg-gray-950 text-white pt-20">
             <div className="max-w-6xl mx-auto px-6 py-12">
@@ -16,16 +19,15 @@ export default function Hero() {
                         animate={{opacity: 1, y:0}}
                         transition={{duration: 0.6}}
                     >
-                        <span className="text-gray-400 mb-4 block text-center lg:text-left"> Desenvolvedor Full Stack
+                        <span className="text-gray-400 mb-4 block text-center lg:text-left"> {t.hero.role}
                             <h1 className="text-5xl font-bold mb-4 text-center lg:text-left">
-                                Olá, Eu sou 
+                                {t.hero.greeting} 
                                 <span className="block text-emerald-400 mt-2">
-                                    Alex Bruno
+                                    {t.hero.name}
                                 </span>
                             </h1>
                             <p className="text-gray-400 mb-8 text-center lg:text-left">
-                                focado em construir interfaces elegantes e sistemas eficientes. 
-                                Especialista em unir design intuitivo com arquiteturas de software sólidas.
+                                {t.hero.description}
                             </p>
                             <div className="flex flex-col items-center gap-4 lg:flex-row">
                                 <motion.a
@@ -36,7 +38,7 @@ export default function Hero() {
                                     className="w-full lg:w-auto bg-emerald-400 text-shadow-gray-900 py-3 rounded-full flex items-center justify-center gap-2 px-6 hover:bg-emerald-300"
                                 >
                                     <LuDownload size={20} />
-                                    Download
+                                    {t.hero.download}
                                 </motion.a>
 
                                 <div className="flex items-center gap-4">
@@ -131,7 +133,10 @@ export default function Hero() {
                             <CountUp value={Number(stat.number)}></CountUp>
                         </h2>
                         <p className="text-gray-400 text-sm">
-                            {stat.text}
+                            {index === 0 ? t.stats.yearsExperience : 
+                             index === 1 ? t.stats.projects :
+                             index === 2 ? t.stats.technologies : 
+                             t.stats.commits}
                         </p>
                     </div>
                 ))}

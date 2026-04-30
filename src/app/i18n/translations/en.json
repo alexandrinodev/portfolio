@@ -1,0 +1,113 @@
+{
+  "nav": {
+    "home": "Home",
+    "services": "Services",
+    "resume": "Resume",
+    "work": "Projects",
+    "contact": "Contact",
+    "hireMe": "Hire Me"
+  },
+  "hero": {
+    "role": "Full Stack Developer",
+    "greeting": "Hello, I'm",
+    "name": "Alex Bruno",
+    "description": "Focused on building elegant interfaces and efficient systems. Specialist in combining intuitive design with solid software architectures.",
+    "download": "Download CV"
+  },
+  "stats": {
+    "yearsExperience": "Years of Experience",
+    "projects": "Projects",
+    "technologies": "Technologies Mastered",
+    "commits": "Code Commits"
+  },
+  "services": {
+    "webDev": {
+      "title": "Web Developer",
+      "description": "Creation of modern, responsive, high-performance websites using the most recent technologies in the market.",
+      "features": ["React & Next.js", "SPAs and Landing Pages"]
+    },
+    "uiux": {
+      "title": "UI/UX Design",
+      "description": "Development of intuitive, user-centered interfaces to guarantee the best browsing experience.",
+      "features": ["Figma Prototyping", "Responsive Design"]
+    },
+    "branding": {
+      "title": "Branding & Identity",
+      "description": "Creation of unique visual elements that communicate your brand's essence and connect with your target audience.",
+      "features": ["Logos", "Style Guide"]
+    },
+    "seo": {
+      "title": "SEO Optimization",
+      "description": "Application of advanced techniques to improve your website ranking on search engines like Google.",
+      "features": ["Core Web Vitals", "On-Page SEO"]
+    }
+  },
+  "experience": {
+    "experiences": "Experiences",
+    "education": "Education",
+    "skills": "Skills",
+    "aboutMe": "About Me"
+  },
+  "resume": {
+    "experience": [
+      {
+        "period": "2025 - Present",
+        "title": "Software Engineer",
+        "company": "Sidia Instituto de Ciência e Tecnologia - SIDIA",
+        "description": "Application development using Nextjs, Javascript, Node.js, Python, Go"
+      },
+      {
+        "period": "2022 - 2025",
+        "title": "Test Developer Jr.",
+        "company": "Sidia Instituto de Ciência e Tecnologia - SIDIA",
+        "description": "Compatibility tests, black box, regression"
+      }
+    ],
+    "education": [
+      {
+        "period": "2017 - 2020",
+        "title": "Computer Science",
+        "institution": "UNINORTE",
+        "description": "Bachelor's degree focused on web development"
+      }
+    ],
+    "skills": {
+      "frontend": ["React", "Next.js", "TypeScript"],
+      "backend": ["Node.js", "Python", "PostgreSQL", "MongoDB"],
+      "devops": ["Git", "Docker", "Kubernetes", "CI/CD"],
+      "softSkills": ["Communication", "Leadership", "Teamwork"]
+    },
+    "about": {
+      "description": "Full Stack Developer passionate about creating innovative and scalable solutions. Experience in modern web development and agile practices.",
+      "interests": ["Open Source", "UI/UX Design", "Cloud Computing", "Machine Learning"]
+    }
+  },
+  "projects": {
+    "hardware": {
+      "title": "Hardware Detection Agent",
+      "description": "A robust desktop agent that detects hardware components in real time and sends data to a centralized dashboard."
+    },
+    "qa": {
+      "title": "QA Automation Dashboard",
+      "description": "Platform for monitoring automated tests and system validation, optimizing the Quality Assurance workflow."
+    },
+    "ecommerce": {
+      "title": "Fullstack E-commerce API",
+      "description": "Scalable API with queue integration for order processing and real-time inventory management."
+    }
+  },
+  "contact": {
+    "phone": "Phone",
+    "email": "Email",
+    "address": "Address",
+    "button-send": "Send Message",
+    "first-name": "First Name",
+    "first-name-required": "First Name is required",
+    "last-name": "Last Name",
+    "last-name-required": "Last Name is required",
+    "email-address": "Email Address",
+    "phone-number": "Phone Number",
+    "select-service": "Select a service",
+    "type-message": "Type your message here"
+    }
+}

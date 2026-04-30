@@ -1,15 +1,24 @@
 "use client"
 
-import { services } from "@/app/lib/contants"
+import { services } from "@/app/lib/constants"
 import { motion } from "framer-motion"
+import { useLanguage } from "@/app/i18n/LanguageContext"
 
 export default function Services(){
+    const { t } = useLanguage()
+    const servicesList = [
+        { ...services[0], ...t.services.webDev },
+        { ...services[1], ...t.services.uiux },
+        { ...services[2], ...t.services.branding },
+        { ...services[3], ...t.services.seo }
+    ]
+    
     return(
         <section className="min-h-screen bg-gray-900 text-white pt-15">
             <div className="max-w-6xl mx-auto px-6 py-12">
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8">
-                    {services.map((service,index) => (
+                    {servicesList.map((service,index) => (
                         <motion.div 
                             key={index}
                             initial={{opacity: 0, y: 20}}
@@ -33,7 +42,7 @@ export default function Services(){
                             <p className="text-gray-400 mb-6">{service.description}</p>
 
                             <div className="flex flex-wrap gap-2">
-                                {service.features.map((feature,index) => (
+                                {service.features?.map((feature,index) => (
                                     <span 
                                         key={index}
                                         className="px-3 text-sm bg-emerald-500 text-gray-900 rounded-full"
