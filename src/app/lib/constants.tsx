@@ -81,18 +81,27 @@ export const flags = [
 ]
 
 export const skillsData = [
+    // Frontend
     { name: "HTML5", icon: "/icons/html5.svg" },
+    { name: "CSS3", icon: "/icons/css3.svg" },
+    { name: "Tailwind CSS", icon: "/icons/tailwind.svg" },
     { name: "React", icon: "/icons/react.svg" },
     { name: "Next.js", icon: "/icons/nextjs.svg" },
     { name: "TypeScript", icon: "/icons/typescript.svg" },
 
     // Backend
     { name: "Node.js", icon: "/icons/nodejs.svg" },
+    { name: "Go", icon: "/icons/golang.svg" },
     { name: "Python", icon: "/icons/python.svg" },
     { name: "PostgreSQL", icon: "/icons/postgres.svg" },
     { name: "MongoDB", icon: "/icons/mongodb.svg" },
+    { name: "FastAPI", icon: "/icons/fastapi.svg" },
+    { name: "RabbitMQ", icon: "/icons/rabbitmq.svg" },
 
     // DevOps
+    { name: "Selenium", icon: "/icons/selenium.svg" },
+    { name: "Linux", icon: "/icons/linux.svg" },
+    { name: "Electron", icon: "/icons/electron.svg" },
     { name: "Git", icon: "/icons/git.svg" },
     { name: "Docker", icon: "/icons/docker.svg" },
     { name: "Kubernetes", icon: "/icons/kubernets.svg" },
