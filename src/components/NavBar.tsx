@@ -37,18 +37,20 @@ export default function NavBar() {
     }
 
     return (
-        <nav className="fixed w-full z-50 bg-gray-950/80 backdrop-blur-sm">
+        <nav className="fixed w-full z-50 bg-gray-950/80 backdrop-blur-sm border-b border-gray-800/50">
             <div className="w-full max-w-6xl mx-auto px-4 sm:px-6">
                 <div className="flex items-center justify-between h-16">
                     <button
                         onClick={() => handleNavClick("/")}
-                        className="text-2xl font-bold text-white cursor-pointer"
+                        className="text-2xl font-bold cursor-pointer"
                     >
                         <motion.div
                             initial={{ opacity: 0, x: -20 }}
                             animate={{ opacity: 1, x: 0 }}
                         >
-                            Alex<span className="text-emerald-400">.</span>JS
+                            <span className="bg-gradient-to-r from-emerald-400 via-cyan-400 to-emerald-400 bg-clip-text text-transparent">
+                                Alex<span className="text-emerald-400">.</span>JS
+                            </span>
                         </motion.div>
                     </button>
 
@@ -69,6 +71,8 @@ export default function NavBar() {
                                             index === 2 ? t.nav.resume :
                                                 index === 3 ? t.nav.work :
                                                     t.nav.contact}
+                                    {/* Hover underline effect */}
+                                    <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-emerald-400 to-cyan-400 group-hover:w-full transition-all duration-300" />
                                 </button>
                             </motion.div>
                         ))}
@@ -76,7 +80,7 @@ export default function NavBar() {
                         <LanguageToggle />
 
                         <motion.button
-                            whileHover={{ scale: 1.05 }}
+                            whileHover={{ scale: 1.05, boxShadow: "0 0 20px rgba(52, 211, 153, 0.4)" }}
                             whileTap={{ scale: 0.95 }}
                             onClick={() => handleNavClick("/contact")}
                             className="bg-emerald-400 text-gray-900 px-6 py-2 rounded-full font-medium hover:bg-emerald-300 transition-colors cursor-pointer"
@@ -105,7 +109,7 @@ export default function NavBar() {
                         duration: 0.4,
                         ease: "easeOut"
                     }}
-                    className="md:hidden bg-gray-900 px-6 py-4"
+                    className="md:hidden bg-gray-900/95 backdrop-blur-md px-6 py-4 border-t border-gray-800/50"
 
                 >
                     {menuItems.map((item, index) => (
