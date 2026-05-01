@@ -14,12 +14,14 @@
     "description": "Transformo ideias em aplicações robustas, unindo interfaces modernas a sistemas de alta performance. Especialista em criar soluções completas que equilibram experiência do usuário e eficiência técnica.",
     "download": "Download CV"
   },
-  "stats": {
+"stats": {
     "yearsExperience": "Anos de Experiência",
     "projects": "Projetos",
     "technologies": "Tecnologias Dominadas",
     "commits": "Commits de Códigos"
   },
+  "servicesTitle": "Meus Serviços",
+  "servicesSubtitle": "Especializado em criar soluções completas que equilibram experiência do usuário e eficiência técnica.",
   "services": {
     "fullstack": {
       "title": "Desenvolvimento Full Stack",

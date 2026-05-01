@@ -14,12 +14,14 @@
     "description": "Turning ideas into robust applications by combining modern interfaces with high-performance systems. I specialize in building end-to-end solutions where user experience meets technical excellence.",
     "download": "Download CV"
   },
-  "stats": {
+"stats": {
     "yearsExperience": "Years of Experience",
     "projects": "Projects",
     "technologies": "Technologies Mastered",
     "commits": "Code Commits"
   },
+  "servicesTitle": "My Services",
+  "servicesSubtitle": "Specialized in building end-to-end solutions where user experience meets technical excellence.",
   "services": {
     "fullstack": {
       "title": "Full Stack Development",
