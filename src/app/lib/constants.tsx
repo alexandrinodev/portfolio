@@ -1,6 +1,8 @@
+import React from 'react'
 import { Mail, MapPin, Phone } from 'lucide-react'
-import { FaPallet } from 'react-icons/fa'
-import { LuFileCode2, LuGithub, LuInstagram, LuLinkedin, LuPenTool, LuSearch, LuYoutube } from 'react-icons/lu'
+import { LuFileCode2, LuGithub, LuInstagram, LuLinkedin, LuPenTool } from 'react-icons/lu'
+import { TbAutomation } from 'react-icons/tb'
+import { MdHighQuality } from 'react-icons/md'
 
 export const socialLinks = [
     {icon: <LuGithub size={20} />, href: "https://github.com/alexandrinodev"},
@@ -9,10 +11,10 @@ export const socialLinks = [
 ]
 
 export const stats = [
-    { number: "2", text: "Anos de Experiência"},
-    { number: "5", text: "Projetos"},
-    { number: "10", text: "Tecnologias Dominadas"},
-    { number: "500", text: "Commits de Códigos"},
+    { number: "2"},
+    { number: "5"},
+    { number: "10"},
+    { number: "500"},
 ]
 
 export const menuItems = [
@@ -23,36 +25,13 @@ export const menuItems = [
     {title: "Contato", path: "/contact"},
 ]
 
-export const services = [
-    {
-        number: "01",
-        icon: <LuFileCode2 size={32} />,
-        title: "Desenvolvedor Web",
-        description: "Criação de sites modernos, responsivos e de alta performance utilizando as tecnologias mais recentes do mercado.",
-        features: ["React & Next.js", "SPAs e Landing Pages"]
-    },
-    {
-        number: "02",
-        icon: <FaPallet size={32} />,
-        title: "UI/UX Design",
-        description: "Desenvolvimento de interfaces intuitivas e centradas no usuário para garantir a melhor experiência de navegação.",
-        features: ["Prototipagem no Figma", "Design Responsivo"]
-    },
-    {
-        number: "03",
-        icon: <LuPenTool size={32} />,
-        title: "Branding & Identidade",
-        description: "Criação de elementos visuais únicos que comunicam a essência da sua marca e conectam com seu público-alvo.",
-        features: ["Logotipos", "Guia de Estilo"]
-    },
-    {
-        number: "04",
-        icon: <LuSearch size={32} />,
-        title: "Otimização de SEO",
-        description: "Aplicação de técnicas avançadas para melhorar o rankeamento do seu site nos motores de busca como o Google.",
-        features: ["Core Web Vitals", "SEO On-Page"]
-    },
-]
+// Mapeamento de ícones para serviços dynamics (chave em t.services)
+export const serviceIcons: Record<string, React.ReactNode> = {
+    fullstack: <LuFileCode2 size={32} />,
+    backend: <LuPenTool size={32} />,
+    automation: <TbAutomation size={32} />,
+    quality: <MdHighQuality size={32} />,
+}
 
 export const ExperienceTabs = [
     {title: "Experiências", id: "experiencias"},
@@ -95,6 +74,11 @@ export const resumeData = {
         interests: ["Open Source", "UI/UX Design", "Cloud Computing", "Machine Learning"]
     }
 }
+
+export const flags = [
+    {name: "Brasil" , icon: "/flag_of_brazil.svg"},
+    {name: "USA" , icon: "/flag_of_usa.svg"}
+]
 
 export const skillsData = [
     { name: "HTML5", icon: "/icons/html5.svg" },

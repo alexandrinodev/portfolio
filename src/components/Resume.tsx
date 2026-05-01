@@ -1,5 +1,5 @@
 "use client"
-import { ExperienceTabs, resumeData, skillsData } from '@/app/lib/constants'
+import { skillsData } from '@/app/lib/constants'
 import { AnimatePresence, motion } from 'framer-motion'
 import Image from 'next/image'
 import { useState } from 'react'
@@ -8,12 +8,20 @@ import { useLanguage } from '@/app/i18n/LanguageContext'
 export default function Resume() {
     const { t } = useLanguage()
     const [activateTab, SetActivateTab] = useState("experiencias")
+    
+    const experienceTabs = [
+        { id: "experiencias", title: t.experience.experiences },
+        { id: "educacao", title: t.experience.education },
+        { id: "skills", title: t.experience.skills },
+        { id: "about", title: t.experience.aboutMe },
+    ]
+    
     const renderContent = () => {
         switch(activateTab){
-            case "experiencias":
+case "experiencias":
                 return(
                     <div className='grid md:grid-cols-2 gap-8'>
-                        {resumeData.experience.map((exp, id) => (
+                        {t.resume.experience.map((exp, id) => (
                             <motion.div
                                 key={id}
                                 initial={{ opacity: 0, y: -20 }}
@@ -34,10 +42,10 @@ export default function Resume() {
                         ))}
                     </div>
                 )
-            case "educacao":
+case "educacao":
                 return(
                     <div className='grid md:grid-cols-2 gap-8'>
-                        {resumeData.education.map((education, id) => (
+                        {t.resume.education.map((education, id) => (
                             <motion.div
                                 key={id}
                                 initial={{ opacity: 0, y: -20 }}
@@ -97,7 +105,7 @@ export default function Resume() {
                             <h3 className='text-xl font-bold mb-4'>{t.experience.aboutMe}</h3>
                             <p className='text-gray-400'>{t.resume.about.description}</p>
                         </div>
-                        <div className='bg-gray-900 p-6 rounded-xl'>
+<div className='bg-gray-900 p-6 rounded-xl'>
                             <h3 className='text-xl font-bold mb-4'>Interesses</h3>
                             <div className='flex flex-wrap gap-2'>{t.resume.about.interests.map((interest,index) => (
                                 <span 
@@ -133,7 +141,7 @@ export default function Resume() {
                         </motion.h2>
 
                         <div className='space-y-2'>
-                            {ExperienceTabs.map((tab, index) => (
+                            {experienceTabs.map((tab, index) => (
                                 <motion.button
                                     key={tab.id}
                                     initial={{ opacity: 0, x: -20 }}
@@ -163,7 +171,7 @@ export default function Resume() {
                             animate={{ opacity: 1, y: 0 }}
                             className='text-3xl font-bold mb-8'
                         >
-                            {ExperienceTabs.find(tab => tab.id === activateTab)?.title}
+                            {experienceTabs.find(tab => tab.id === activateTab)?.title}
                         </motion.h2>
 
                         <AnimatePresence mode="wait">

@@ -93,14 +93,15 @@ export default function Contact(){
                                 className="w-full bg-gray-800 rounded-lg p-3 text-white border border-gray-700 focus:border-emerald-400 focus:outline-none"
                             />
 
-                            <select
+<select
                                 {...register("service")}
                                 className="w-full bg-gray-800 rounded-lg p-3 text-white border border-gray-700 focus:border-emerald-400 focus:outline-none"
                             >
                                 <option value="">{t.contact["select-service"]}</option>
-                                <option value="web">{t.services.webDev.title}</option>
-                                <option value="backend">{t.services.uiux.title}</option>
-                                <option value="fullstack">{t.services.branding.title}</option>
+                                <option value="fullstack">{t.services.fullstack.title}</option>
+                                <option value="backend">{t.services.backend.title}</option>
+                                <option value="automation">{t.services.automation.title}</option>
+                                <option value="quality">{t.services.quality.title}</option>
                             </select>
 
 

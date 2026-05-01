@@ -11,7 +11,7 @@
     "role": "Full Stack Developer",
     "greeting": "Hello, I'm",
     "name": "Alex Bruno",
-    "description": "Focused on building elegant interfaces and efficient systems. Specialist in combining intuitive design with solid software architectures.",
+    "description": "Turning ideas into robust applications by combining modern interfaces with high-performance systems. I specialize in building end-to-end solutions where user experience meets technical excellence.",
     "download": "Download CV"
   },
   "stats": {
@@ -21,25 +21,25 @@
     "commits": "Code Commits"
   },
   "services": {
-    "webDev": {
-      "title": "Web Developer",
-      "description": "Creation of modern, responsive, high-performance websites using the most recent technologies in the market.",
-      "features": ["React & Next.js", "SPAs and Landing Pages"]
+    "fullstack": {
+      "title": "Full Stack Development",
+      "description": "Building end-to-end applications by merging dynamic React/Next.js front-ends with robust, scalable back-ends.",
+      "features": ["Web Apps & Dashboards", "JavaScript/TypeScript Ecosystem"]
     },
-    "uiux": {
-      "title": "UI/UX Design",
-      "description": "Development of intuitive, user-centered interfaces to guarantee the best browsing experience.",
-      "features": ["Figma Prototyping", "Responsive Design"]
+    "backend": {
+      "title": "Architecture & APIs",
+      "description": "Developing efficient systems and service integrations using modern, secure architectures.",
+      "features": ["Python APIs (FastAPI/Flask)", "Messaging & Queues (RabbitMQ)"]
     },
-    "branding": {
-      "title": "Branding & Identity",
-      "description": "Creation of unique visual elements that communicate your brand's essence and connect with your target audience.",
-      "features": ["Logos", "Style Guide"]
+    "automation": {
+      "title": "Automation & Performance",
+      "description": "Optimizing workflows and creating intelligent automations to boost system operational efficiency.",
+      "features": ["Workflow Automation", "Web Scraping & Selenium"]
     },
-    "seo": {
-      "title": "SEO Optimization",
-      "description": "Application of advanced techniques to improve your website ranking on search engines like Google.",
-      "features": ["Core Web Vitals", "On-Page SEO"]
+    "quality": {
+      "title": "Quality & Testing",
+      "description": "Ensuring high-reliability delivery through automated testing and rigorous software validation.",
+      "features": ["Automated Testing", "QA & Software Assurance"]
     }
   },
   "experience": {

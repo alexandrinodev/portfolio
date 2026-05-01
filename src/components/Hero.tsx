@@ -37,8 +37,10 @@ export default function Hero() {
                                     whileTap={{scale: 0.95}}
                                     className="w-full lg:w-auto bg-emerald-400 text-shadow-gray-900 py-3 rounded-full flex items-center justify-center gap-2 px-6 hover:bg-emerald-300"
                                 >
-                                    <LuDownload size={20} />
-                                    {t.hero.download}
+                                    <LuDownload size={20} className="text-gray-900"/>
+                                    <span className="text-gray-900">
+                                        {t.hero.download}
+                                    </span>
                                 </motion.a>
 
                                 <div className="flex items-center gap-4">
@@ -111,10 +113,10 @@ export default function Hero() {
                             />
 
                             <Image
-                                src="/avatar.jpg"
+                                src="/avatar-bg.png"
                                 alt="Seu Avatar"
                                 fill
-                                className="object-cover rounded-full p-4"
+                                className="object-cover rounded-full p-3"
                             />
                         </div>
             
@@ -133,10 +135,12 @@ export default function Hero() {
                             <CountUp value={Number(stat.number)}></CountUp>
                         </h2>
                         <p className="text-gray-400 text-sm">
-                            {index === 0 ? t.stats.yearsExperience : 
-                             index === 1 ? t.stats.projects :
-                             index === 2 ? t.stats.technologies : 
-                             t.stats.commits}
+                            {
+                                index === 0 ? t.stats.yearsExperience : 
+                                index === 1 ? t.stats.projects :
+                                index === 2 ? t.stats.technologies : 
+                                t.stats.commits
+                            }
                         </p>
                     </div>
                 ))}

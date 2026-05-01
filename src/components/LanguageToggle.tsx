@@ -23,8 +23,8 @@ export default function LanguageToggle() {
             </span>
             <motion.span
                 initial={false}
-                animate={{ opacity: [0, 1, 0] }}
-                transition={{ duration: 0.3 }}
+                animate={{ opacity: [0, 1] }}
+                transition={{ duration: 0.5 }}
                 className="text-xs"
             >
                 {language === "pt" ? "🇧🇷" : "🇺🇸"}

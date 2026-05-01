@@ -11,7 +11,7 @@
     "role": "Desenvolvedor Full Stack",
     "greeting": "Olá, Eu sou",
     "name": "Alex Bruno",
-    "description": "Focado em construir interfaces elegantes e sistemas eficientes. Especialista em unir design intuitivo com arquiteturas de software sólidas.",
+    "description": "Transformo ideias em aplicações robustas, unindo interfaces modernas a sistemas de alta performance. Especialista em criar soluções completas que equilibram experiência do usuário e eficiência técnica.",
     "download": "Download CV"
   },
   "stats": {
@@ -21,25 +21,25 @@
     "commits": "Commits de Códigos"
   },
   "services": {
-    "webDev": {
-      "title": "Desenvolvedor Web",
-      "description": "Criação de sites modernos, responsivos e de alta performance utilizando as tecnologias mais recentes do mercado.",
-      "features": ["React & Next.js", "SPAs e Landing Pages"]
+    "fullstack": {
+      "title": "Desenvolvimento Full Stack",
+      "description": "Criação de aplicações completas, unindo front-ends dinâmicos em React/Next.js a back-ends robustos e escaláveis.",
+      "features": ["Aplicações Web & Dashboards", "Ecossistema JavaScript/TypeScript"]
     },
-    "uiux": {
-      "title": "UI/UX Design",
-      "description": "Desenvolvimento de interfaces intuitivas e centradas no usuário para garantir a melhor experiência de navegação.",
-      "features": ["Prototipagem no Figma", "Design Responsivo"]
+    "backend": {
+      "title": "Arquitetura & APIs",
+      "description": "Desenvolvimento de sistemas eficientes e integração de serviços utilizando arquiteturas modernas e seguras.",
+      "features": ["APIs com Python (FastAPI/Flask)", "Mensageria e Filas (RabbitMQ)"]
     },
-    "branding": {
-      "title": "Branding & Identidade",
-      "description": "Criação de elementos visuais únicos que comunicam a essência da sua marca e conectam com seu público-alvo.",
-      "features": ["Logotipos", "Guia de Estilo"]
+    "automation": {
+      "title": "Automação & Performance",
+      "description": "Otimização de processos e criação de automações inteligentes para aumentar a eficiência operacional de sistemas.",
+      "features": ["Automação de Fluxos", "Web Scraping & Selenium"]
     },
-    "seo": {
-      "title": "Otimização de SEO",
-      "description": "Aplicação de técnicas avançadas para melhorar o rankeamento do seu site nos motores de busca como o Google.",
-      "features": ["Core Web Vitals", "SEO On-Page"]
+    "quality": {
+    "title": "Qualidade & Testes",
+    "description": "Garantia de entrega com alta confiabilidade através de testes automatizados e validação rigorosa de software.",
+    "features": ["Testes Automatizados", "QA & Garantia de Software"]
     }
   },
   "experience": {

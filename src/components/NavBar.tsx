@@ -95,9 +95,19 @@ export default function NavBar() {
                                         ${pathname === item.path ? "text-emerald-400" : "text-gray-300"}`}
                             onClick={() => setIsMenuOpen(false)}
                         >
-                            {item.title}
+
+                            {
+                                index === 0 ? t.nav.home :
+                                index === 1 ? t.nav.services :
+                                index === 2 ? t.nav.resume :
+                                index === 3 ? t.nav.work :
+                                t.nav.contact
+                            }
                         </Link>
                     ))}
+                    <div className="ml-5">
+                        <LanguageToggle />
+                    </div>
                     <button className="w-full bg-emerald-400 text-gray-900 px-6 py-2 
                             rounded-full font-medium mt-4">
                         Me contrate

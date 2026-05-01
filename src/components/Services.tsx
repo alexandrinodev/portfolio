@@ -1,26 +1,22 @@
 "use client"
 
-import { services } from "@/app/lib/constants"
+import { serviceIcons } from "@/app/lib/constants"
 import { motion } from "framer-motion"
 import { useLanguage } from "@/app/i18n/LanguageContext"
 
 export default function Services(){
     const { t } = useLanguage()
-    const servicesList = [
-        { ...services[0], ...t.services.webDev },
-        { ...services[1], ...t.services.uiux },
-        { ...services[2], ...t.services.branding },
-        { ...services[3], ...t.services.seo }
-    ]
+    // Converte o objeto t.services em array de Entries dinamicamente
+    const servicesEntries = Object.entries(t.services)
     
     return(
         <section className="min-h-screen bg-gray-900 text-white pt-15">
             <div className="max-w-6xl mx-auto px-6 py-12">
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8">
-                    {servicesList.map((service,index) => (
+                    {servicesEntries.map(([key, serviceData], index) => (
                         <motion.div 
-                            key={index}
+                            key={key}
                             initial={{opacity: 0, y: 20}}
                             animate={{opacity: 1, y:0}}
                             transition={{
@@ -31,20 +27,20 @@ export default function Services(){
                         >
                             <div className="absolute top-4 right-4 text-4xl font-bold
                             text-emerald-400/10 group-hover:text-emerald-500/20 transition-all">
-                                {service.number}
+                                {String(index + 1).padStart(2, '0')}
                             </div>
 
                             <div className="mb-6 text-emerald-400 p-3 bg-emerald-400/10 rounded-lg w-fit">
-                                {service.icon}
+                                {serviceIcons[key] || serviceIcons.fullstack}
                             </div>
 
-                            <h3 className="text-2xl font-bold mb-3">{service.title}</h3>
-                            <p className="text-gray-400 mb-6">{service.description}</p>
+                            <h3 className="text-2xl font-bold mb-3">{serviceData.title}</h3>
+                            <p className="text-gray-400 mb-6">{serviceData.description}</p>
 
                             <div className="flex flex-wrap gap-2">
-                                {service.features?.map((feature,index) => (
+                                {serviceData.features?.map((feature: string, idx: number) => (
                                     <span 
-                                        key={index}
+                                        key={idx}
                                         className="px-3 text-sm bg-emerald-500 text-gray-900 rounded-full"
                                     >
                                         {feature}
