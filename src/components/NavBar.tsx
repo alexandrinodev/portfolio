@@ -1,6 +1,4 @@
 "use client"
-import Link from "next/link"
-import { usePathname } from "next/navigation"
 import { useState } from "react"
 import { motion } from "framer-motion"
 import { menuItems } from "@/app/lib/constants"
@@ -8,24 +6,51 @@ import { Menu, X } from "lucide-react"
 import LanguageToggle from "./LanguageToggle"
 import { useLanguage } from "@/app/i18n/LanguageContext"
 
+const scrollToSection = (id: string) => {
+    const element = document.getElementById(id)
+    if (element) {
+        const offset = 64 // altura da navbar
+        const bodyRect = document.body.getBoundingClientRect().top
+        const elementRect = element.getBoundingClientRect().top
+        const elementPosition = elementRect - bodyRect
+        const offsetPosition = elementPosition - offset
+
+        window.scrollTo({
+            top: offsetPosition,
+            behavior: "smooth"
+        })
+    }
+}
+
 export default function NavBar() {
     const { t } = useLanguage()
-    const pathname = usePathname()
     const [isMenuOpen, setIsMenuOpen] = useState(false)
 
+    const handleNavClick = (id: string) => {
+        if (id === "/") {
+            window.scrollTo({ top: 0, behavior: "smooth" })
+        } else {
+            const sectionId = id.replace("/", "")
+            scrollToSection(sectionId)
+        }
+        setIsMenuOpen(false)
+    }
+
     return (
-        <nav className="fixed w-full z-50 bg-gray-950/80 backgrop-blur-sm">
+        <nav className="fixed w-full z-50 bg-gray-950/80 backdrop-blur-sm">
             <div className="w-full max-w-6xl mx-auto px-4 sm:px-6">
                 <div className="flex items-center justify-between h-16">
-                    <Link href="/">
+                    <button
+                        onClick={() => handleNavClick("/")}
+                        className="text-2xl font-bold text-white cursor-pointer"
+                    >
                         <motion.div
                             initial={{ opacity: 0, x: -20 }}
                             animate={{ opacity: 1, x: 0 }}
-                            className="text-2xl font-bold text-white"
                         >
                             Alex<span className="text-emerald-400">.</span>JS
                         </motion.div>
-                    </Link>
+                    </button>
 
                     {/* Menu Desktop */}
                     <div className="hidden md:flex items-center space-x-8">
@@ -35,20 +60,16 @@ export default function NavBar() {
                                 whileHover={{ y: -2 }}
                                 whileTap={{ scale: 0.95 }}
                             >
-                                <Link
-                                    href={item.path}
-                                    className={`${pathname === item.path ? "text-emerald-400" : "text-gray-400"} 
-                                                hover:text-emerald-400 transition-colors relative group:`}
+                                <button
+                                    onClick={() => handleNavClick(item.path)}
+                                    className="text-gray-400 hover:text-emerald-400 transition-colors relative group cursor-pointer"
                                 >
                                     {index === 0 ? t.nav.home :
                                         index === 1 ? t.nav.services :
                                             index === 2 ? t.nav.resume :
                                                 index === 3 ? t.nav.work :
                                                     t.nav.contact}
-                                    {pathname === item.path && (
-                                        <span className="absolute -bottom-1 left-0 w-full h-0.5 bg-emerald-400" />
-                                    )}
-                                </Link>
+                                </button>
                             </motion.div>
                         ))}
 
@@ -57,8 +78,8 @@ export default function NavBar() {
                         <motion.button
                             whileHover={{ scale: 1.05 }}
                             whileTap={{ scale: 0.95 }}
-                            className="bg-emerald-400 text-gray-900 px-6 py-2 rounded-full
-                            font-medium hover:bg-emerald-300 transition-colors"
+                            onClick={() => handleNavClick("/contact")}
+                            className="bg-emerald-400 text-gray-900 px-6 py-2 rounded-full font-medium hover:bg-emerald-300 transition-colors cursor-pointer"
                         >
                             {t.nav.hireMe}
                         </motion.button>
@@ -84,16 +105,14 @@ export default function NavBar() {
                         duration: 0.4,
                         ease: "easeOut"
                     }}
-                    className="md:hidden bg-gray-900 -px-6 py-4"
+                    className="md:hidden bg-gray-900 px-6 py-4"
 
                 >
                     {menuItems.map((item, index) => (
-                        <Link
+                        <button
                             key={index}
-                            href={item.path}
-                            className={`block py-6 px-6 w-full
-                                        ${pathname === item.path ? "text-emerald-400" : "text-gray-300"}`}
-                            onClick={() => setIsMenuOpen(false)}
+                            onClick={() => handleNavClick(item.path)}
+                            className="block py-6 px-6 w-full text-left text-gray-300 hover:text-emerald-400 transition-colors cursor-pointer"
                         >
 
                             {
@@ -103,14 +122,16 @@ export default function NavBar() {
                                 index === 3 ? t.nav.work :
                                 t.nav.contact
                             }
-                        </Link>
+                        </button>
                     ))}
                     <div className="ml-5">
                         <LanguageToggle />
                     </div>
-                    <button className="w-full bg-emerald-400 text-gray-900 px-6 py-2 
-                            rounded-full font-medium mt-4">
-                        Me contrate
+                    <button
+                        onClick={() => handleNavClick("/contact")}
+                        className="w-full bg-emerald-400 text-gray-900 px-6 py-2 rounded-full font-medium mt-4 cursor-pointer"
+                    >
+                        {t.nav.hireMe}
                     </button>
                 </motion.div>
             )}
