@@ -225,7 +225,7 @@ return (
                             animate={{ opacity: 1, y: 0 }}
                             className="text-3xl md:text-4xl font-bold mb-8"
                         >
-                            <span className="bg-gradient-to-r from-emerald-400 via-cyan-400 to-emerald-400 bg-clip-text text-transparent bg-[length:200%_auto]"
+                            <motion.span className="bg-gradient-to-r from-emerald-400 via-cyan-400 to-emerald-400 bg-clip-text text-transparent bg-[length:200%_auto]"
                                 animate={{
                                     backgroundPosition: ["0% center", "100% center", "0% center"]
                                 }}
@@ -236,7 +236,7 @@ return (
                                 }}
                             >
                                 {t.nav.hireMe}
-                            </span>
+                            </motion.span>
                         </motion.h2>
 
                         <div className='space-y-3'>
