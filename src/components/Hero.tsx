@@ -85,7 +85,7 @@ export default function Hero() {
                         <div className="flex flex-col items-center gap-4 lg:flex-row">
                             {/* Download Button with Glow Effect */}
                             <motion.a
-                                href="/curriculo.pdf"
+                                href="/cv/EN%20-%20Software%20Engineer%20-%20Alex%20Alexandrino.pdf"
                                 download
                                 whileHover={{ scale: 1.05, boxShadow: "0 0 30px rgba(52, 211, 153, 0.4)" }}
                                 whileTap={{ scale: 0.95 }}
@@ -109,6 +109,7 @@ export default function Hero() {
                                     <motion.a
                                         key={index}
                                         href={social.href}
+                                        aria-label={social.name}
                                         target="_blank"
                                         rel="noopener noreferrer"
                                         whileHover={{ scale: 1.15, y: -3 }}
@@ -131,12 +132,12 @@ export default function Hero() {
                             duration: 1,
                             ease: "easeOut"
                         }}
-                        className="relative flex-1 flex justify-center"
+                        className="relative w-full lg:flex-1 flex justify-center"
                     >
                         {/* Glow Effect Behind Avatar */}
                         <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/20 via-cyan-500/20 to-transparent rounded-full blur-3xl scale-75" />
                         
-                        <div className="w-[320px] h-[320px] md:w-[380px] md:h-[380px] relative">
+                        <div className="w-full max-w-[320px] aspect-square md:max-w-[380px] relative">
                             {/* Rotating Ring 1 */}
                             <motion.div
                                 animate={{ rotate: 360 }}
@@ -187,7 +188,7 @@ export default function Hero() {
                             >
                                 <Image
                                     src="/avatar-bg.png"
-                                    alt="Avatar"
+                                    alt={t.hero.avatarAlt}
                                     fill
                                     className="object-cover rounded-full p-2"
                                 />
@@ -214,14 +215,11 @@ export default function Hero() {
                             className="p-5 rounded-2xl bg-gray-800/30 backdrop-blur-sm border border-gray-700/30 hover:border-emerald-500/30 hover:bg-emerald-500/5 transition-all duration-300 group"
                         >
                             <h2 className="text-3xl md:text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-cyan-400">
-                                <CountUp value={Number(stat.number)}></CountUp>
+                                <CountUp value={Number(stat.number)} />{stat.suffix}
                             </h2>
                             <p className="text-gray-400 text-sm mt-2 group-hover:text-gray-300 transition-colors">
                                 {
-                                    index === 0 ? t.stats.yearsExperience :
-                                        index === 1 ? t.stats.projects :
-                                            index === 2 ? t.stats.technologies :
-                                                t.stats.commits
+                                    t.stats[stat.key]
                                 }
                             </p>
                         </motion.div>

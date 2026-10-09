@@ -1,44 +1,13 @@
 "use client"
-import { useState } from "react"
-import { useForm } from "react-hook-form"
-import emailjs from "@emailjs/browser"
-import {motion} from "framer-motion"
-import { contactInfo } from "@/app/lib/constants"
-import { Send } from "lucide-react"
+import { motion } from "framer-motion"
+import { contactInfo, getWhatsAppLink } from "@/app/lib/constants"
+import { FaWhatsapp } from "react-icons/fa6"
 import { useLanguage } from "@/app/i18n/LanguageContext"
 
-type FormData = {
-    firstName: string
-    lastName: string
-    email: string
-    phone: string
-    service: string
-    message: string
-}
-
-export default function Contact(){
+export default function Contact() {
     const { t } = useLanguage()
-    const [isSubmitting, setIsSubmitting] = useState(false)
-    const {register, handleSubmit, formState, reset} = useForm<FormData>()
+    const whatsappLink = getWhatsAppLink(t.contact.whatsappMessage)
 
-    const onSubmit = async(data: FormData) => {
-        setIsSubmitting(true)
-        try {
-            await emailjs.send(
-                "YOUR_SERVICE_ID",
-                "YOUR_TEMPLADE_ID",
-                data,
-                "YOUR_PUBLIC_KEY"
-            )
-            reset()
-            alert("Mensagem Enviada com Sucesso!")
-        } catch (error) {
-            console.error(error)
-            alert("Erro ao enviar mensagem. Tente novamente")
-        }
-        setIsSubmitting(false)
-    }
-    
 return(
         <section className="min-h-screen bg-gray-950 text-white pt-20 relative overflow-hidden">
             {/* Gradient Background Effect */}
@@ -71,7 +40,7 @@ return(
             <div className="max-w-5xl mx-auto px-6 py-12 relative z-10">
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16">
 
-                    {/* FORMULARIO */}
+                    {/* CONTATO VIA WHATSAPP */}
                     <motion.div
                         initial={{ opacity: 0, x: 20}}
                         animate={{ opacity: 1, x: 0}}
@@ -79,82 +48,22 @@ return(
                     >
                         <h2 className="text-3xl font-bold mb-4">
                             <span className="bg-gradient-to-r from-emerald-400 via-cyan-400 to-emerald-400 bg-clip-text text-transparent">
-                                {t.nav.hireMe}
+                                {t.contact.title}
                             </span>
                         </h2>
-                        <p className="text-gray-400 mb-8">{t.hero.description}</p>
+                        <p className="text-gray-400 mb-8">{t.contact.description}</p>
 
-                        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-                            <div className="grid grid-cols-2 gap-4">
-                                <div>
-                                    <input 
-                                        {...register("firstName", {required: true})}
-                                        placeholder={t.contact["first-name"]}
-                                        className="w-full bg-gray-800/50 backdrop-blur-sm border border-gray-700/30 rounded-lg p-3 text-white focus:border-emerald-400 focus:outline-none focus:ring-2 focus:ring-emerald-400/20 transition-all"
-                                        
-                                    />
-                                    {formState.errors.firstName && 
-                                        <span className="text-red-500"> {t.contact["first-name-required"]}</span>
-                                    }
-                                </div>
-                                <div>
-                                    <input 
-                                        {...register("lastName", {required: true})}
-                                        placeholder={t.contact["last-name"]}
-                                        className="w-full bg-gray-800/50 backdrop-blur-sm border border-gray-700/30 rounded-lg p-3 text-white focus:border-emerald-400 focus:outline-none focus:ring-2 focus:ring-emerald-400/20 transition-all"
-                                        
-                                    />
-                                    {formState.errors.lastName && 
-                                        <span className="text-red-500"> {t.contact["last-name-required"]}</span>
-                                    }
-                                </div>
-                            </div>
-
-                            <input
-                                {...register("email", {required: true, pattern: /^\S+@\S+$/i})}
-                                placeholder={t.contact["email-address"]}
-                                className="w-full bg-gray-800/50 backdrop-blur-sm border border-gray-700/30 rounded-lg p-3 text-white focus:border-emerald-400 focus:outline-none focus:ring-2 focus:ring-emerald-400/20 transition-all"
-                            />
-
-                            <input
-                                {...register("phone")}
-                                placeholder={t.contact["phone-number"]}
-                                className="w-full bg-gray-800/50 backdrop-blur-sm border border-gray-700/30 rounded-lg p-3 text-white focus:border-emerald-400 focus:outline-none focus:ring-2 focus:ring-emerald-400/20 transition-all"
-                            />
-
-                            <select
-                                {...register("service")}
-                                className="w-full bg-gray-800/50 backdrop-blur-sm border border-gray-700/30 rounded-lg p-3 text-white focus:border-emerald-400 focus:outline-none focus:ring-2 focus:ring-emerald-400/20 transition-all"
-                            >
-                                <option value="">{t.contact["select-service"]}</option>
-                                <option value="fullstack">{t.services.fullstack.title}</option>
-                                <option value="backend">{t.services.backend.title}</option>
-                                <option value="automation">{t.services.automation.title}</option>
-                                <option value="quality">{t.services.quality.title}</option>
-                            </select>
-
-
-                            <textarea
-                                {...register("message", {required: true})}
-                                placeholder={t.contact["type-message"]}
-                                rows={6}
-                                className="w-full bg-gray-800/50 backdrop-blur-sm border border-gray-700/30 rounded-lg p-3 text-white focus:border-emerald-400 focus:outline-none focus:ring-2 focus:ring-emerald-400/20 transition-all"
-
-                            >
-                            </textarea>
-
-                            <motion.button
-                                whileHover={{scale: 1.02, boxShadow: "0 0 30px rgba(52, 211, 153, 0.4)"}}
-                                whileTap={{scale: 0.9}}
-                                disabled={isSubmitting}
-                                className="bg-emerald-400 text-gray-900 px-8 py-3 rounded-full font-medium hover:bg-emerald-300 transition-colors disabled:opacity-50 flex items-center gap-2"
-                            >
-                                {isSubmitting ? "Sending..." : `${t.contact["button-send"]}`}
-
-                                <Send size={20}/>
-                            </motion.button>
-                            
-                        </form>
+                        <motion.a
+                            href={whatsappLink}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            whileHover={{ scale: 1.02, boxShadow: "0 0 30px rgba(52, 211, 153, 0.4)" }}
+                            whileTap={{ scale: 0.95 }}
+                            className="bg-emerald-400 text-gray-900 px-6 py-3 rounded-full font-medium hover:bg-emerald-300 transition-colors inline-flex items-center justify-center gap-2 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-emerald-400"
+                        >
+                            <FaWhatsapp size={24} aria-hidden="true" />
+                            {t.contact.whatsappButton}
+                        </motion.a>
                     </motion.div>
 
                     {/* INFORMAÇÕES DE CONTATO */}
@@ -174,9 +83,9 @@ return(
                                 <div className={`p-4 rounded-xl ${info.bg}`}>
                                     {info.icon}
                                 </div>
-                                <div>
+                                <div className="min-w-0">
                                     <h3 className="text-gray-400 mb-1">{index === 0 ? t.contact.phone : index === 1 ? t.contact.email : t.contact.address}</h3>
-                                    <p className="text-xl group-hover:text-emerald-400 transition-colors">{info.content}</p>
+                                    <p className="text-lg break-words group-hover:text-emerald-400 transition-colors">{info.content}</p>
                                 </div>
 
                             </motion.div>

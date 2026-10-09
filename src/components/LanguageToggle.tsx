@@ -5,7 +5,7 @@ import { useLanguage } from "@/app/i18n/LanguageContext"
 import { Globe } from "lucide-react"
 
 export default function LanguageToggle() {
-    const { language, toggleLanguage } = useLanguage()
+    const { language, toggleLanguage, t } = useLanguage()
 
     return (
         <motion.button
@@ -15,7 +15,8 @@ export default function LanguageToggle() {
             className="flex items-center gap-2 px-3 py-2 rounded-full bg-gray-800/30 backdrop-blur-sm border border-gray-700/30 
                 text-gray-400 hover:text-emerald-400 hover:border-emerald-400/50 hover:bg-emerald-400/10
                 transition-all duration-300"
-            title={language === "pt" ? "Switch to English" : "Mudar para Português"}
+            title={t.language.switch}
+            aria-label={t.language.switch}
         >
             <Globe size={18} />
             <span className="text-sm font-medium">

@@ -1,5 +1,6 @@
 "use client"
 import { useState } from "react"
+import { usePathname, useRouter } from "next/navigation"
 import { motion } from "framer-motion"
 import { menuItems } from "@/app/lib/constants"
 import { Menu, X } from "lucide-react"
@@ -24,9 +25,16 @@ const scrollToSection = (id: string) => {
 
 export default function NavBar() {
     const { t } = useLanguage()
+    const pathname = usePathname()
+    const router = useRouter()
     const [isMenuOpen, setIsMenuOpen] = useState(false)
 
     const handleNavClick = (id: string) => {
+        if (pathname !== "/") {
+            router.push(id === "/" ? "/" : `/#${id.slice(1)}`)
+            setIsMenuOpen(false)
+            return
+        }
         if (id === "/") {
             window.scrollTo({ top: 0, behavior: "smooth" })
         } else {
@@ -66,11 +74,7 @@ export default function NavBar() {
                                     onClick={() => handleNavClick(item.path)}
                                     className="text-gray-400 hover:text-emerald-400 transition-colors relative group cursor-pointer"
                                 >
-                                    {index === 0 ? t.nav.home :
-                                        index === 1 ? t.nav.services :
-                                            index === 2 ? t.nav.resume :
-                                                index === 3 ? t.nav.work :
-                                                    t.nav.contact}
+                                    {t.nav[item.key]}
                                     {/* Hover underline effect */}
                                     <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-emerald-400 to-cyan-400 group-hover:w-full transition-all duration-300" />
                                 </button>
@@ -92,6 +96,8 @@ export default function NavBar() {
                     {/* Botao Menu Mobile */}
                     <button
                         className="md:hidden text-white p-2"
+                        aria-label={isMenuOpen ? t.nav.closeMenu : t.nav.openMenu}
+                        aria-expanded={isMenuOpen}
                         onClick={() => setIsMenuOpen(!isMenuOpen)}
                     >
                         {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
@@ -120,11 +126,7 @@ export default function NavBar() {
                         >
 
                             {
-                                index === 0 ? t.nav.home :
-                                index === 1 ? t.nav.services :
-                                index === 2 ? t.nav.resume :
-                                index === 3 ? t.nav.work :
-                                t.nav.contact
+                                t.nav[item.key]
                             }
                         </button>
                     ))}
@@ -133,7 +135,7 @@ export default function NavBar() {
                     </div>
                     <button
                         onClick={() => handleNavClick("/contact")}
-                        className="w-full bg-emerald-400 text-gray-900 px-6 py-2 rounded-full font-medium mt-4 cursor-pointer"
+                        className="block text-center w-full bg-emerald-400 text-gray-900 px-6 py-2 rounded-full font-medium mt-4 cursor-pointer"
                     >
                         {t.nav.hireMe}
                     </button>

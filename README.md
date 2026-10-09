@@ -22,10 +22,10 @@ Este é meu portfolio pessoal, desenvolvido para apresentar meus projetos, habil
 ### 🎯 Funcionalidades
 
 - 🏠 **Página Inicial** - Apresentação profissional com estatísticas animadas
-- 💼 **Serviços** - Descrição dos serviços oferecidos (Dev Web, UI/UX, Branding, SEO)
+- 💼 **Serviços** - Descrição dos serviços oferecidos (Full Stack, APIs, Automação e Qualidade)
 - 📋 **Currículo** - Experiências, educação, habilidades e sobre mim
-- 🖥️ **Projetos** - Portfólio de projetos com links para demos e repositórios
-- 📧 **Contato** - Formulário de contato funcional com EmailJS
+- 🖥️ **Projetos** - Entregas profissionais descritas no currículo
+- 📧 **Contato** - Contato direto via WhatsApp
 
 ### ⚡ Tecnologias
 
@@ -36,8 +36,7 @@ Este é meu portfolio pessoal, desenvolvido para apresentar meus projetos, habil
 | **Frontend** | React, Next.js 16, TypeScript |
 | **Estilização** | Tailwind CSS, Framer Motion |
 | **Ícones** | React Icons |
-| **Formulários** | React Hook Form |
-| **Email** | EmailJS |
+| **Contato** | WhatsApp |
 | **Linting** | ESLint |
 
 </div>
@@ -162,10 +161,10 @@ portfolio/
 
 | Métrica | Valor |
 |---------|-------|
-| Anos de Experiência | 2+ |
-| Projetos | 5+ |
-| Tecnologias | 10+ |
-| Commits | 500+ |
+| Anos no ciclo de desenvolvimento | 5 |
+| Anos em aplicações web e desktop | 4 |
+| Redução no tempo de execução de fluxos automatizados | Até 60% |
+| Idiomas | Português nativo e inglês B2 |
 
 </div>
 
@@ -173,9 +172,13 @@ portfolio/
 
 ## 👨‍💻 Sobre Mim
 
-Sou **Alex Bruno**, desenvolvedor Full Stack apaixonado por criar soluções inovadoras e escaláveis. Atualmente trabalho como **Software Engineer** no SIDIA Instituto de Ciência e Tecnologia, onde desenvolvo aplicações web modernas utilizando Next.js, JavaScript, Node.js, Python e Go.
+Sou **Alex Bruno**, Engenheiro de Software Full Stack com 5 anos no ciclo de desenvolvimento de software e 4 anos dedicados a aplicações web e desktop. Atuei no SIDIA como **Tester Engineer (2022–2023)** e **Software Engineer (2023–2026)**, trabalhando com arquitetura orientada a eventos, APIs, automação, DevOps e qualidade.
 
-**Interesses:** Open Source, UI/UX Design, Cloud Computing, Machine Learning
+Minha formação inclui Ciência da Computação na UNINORTE (2017–2020), AOSP no Icomp/UFAM (2024–2025) e pós-graduação em Engenharia de Software com IA Aplicada na UNIPDS, em andamento com conclusão prevista para outubro de 2027.
+
+**Idiomas:** Português nativo e inglês B2.
+
+**Interesses:** Arquitetura de software, automação, IA aplicada e qualidade de software.
 
 ---
 
@@ -185,8 +188,8 @@ Sou **Alex Bruno**, desenvolvedor Full Stack apaixonado por criar soluções ino
 
 [![Email](https://img.shields.io/badge/Email-alexbrunoalexandrino%40gmail.com-red?style=for-the-badge&logo=gmail)](mailto:alexbrunoalexandrino@gmail.com)
 [![GitHub](https://img.shields.io/badge/GitHub-alexandrinodev-181717?style=for-the-badge&logo=github)](https://github.com/alexandrinodev)
-[![LinkedIn](https://img.shields.io/badge/LinkedIn-Alexandrino-blue?style=for-the-badge&logo=linkedin)](https://linkedin.com/in/alexandrinodev)
-[![Instagram](https://img.shields.io/badge/Instagram-@alexandrino.dev-E4405F?style=for-the-badge&logo=instagram)](https://instagram.com/alexandrino.dev)
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-Alexandrino-blue?style=for-the-badge&logo=linkedin)](https://linkedin.com/in/alexandrino-alex)
+[![Instagram](https://img.shields.io/badge/Instagram-@alexandrino.dev-E4405F?style=for-the-badge&logo=instagram)](https://instagram.com/oalexandrino_/)
 
 </div>
 

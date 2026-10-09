@@ -1,20 +1,13 @@
 'use client'
-import { projectsData } from "@/app/lib/constants";
 import { AnimatePresence, motion } from "framer-motion";
-import { ArrowUpRight, ChevronLeft, ChevronRight } from "lucide-react";
-import Image from "next/image";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useState } from "react";
-import { FaGithub } from "react-icons/fa6";
 import { useLanguage } from "@/app/i18n/LanguageContext";
 
 export default function Work() {
     const { t } = useLanguage()
-    const projects = [
-        { ...projectsData[0], ...t.projects.hardware },
-        { ...projectsData[1], ...t.projects.qa },
-        { ...projectsData[2], ...t.projects.ecommerce }
-    ]
-    
+    const projects = t.projects
+
     const [currentIndex, SetCurrentIndex] = useState(0)
 
     const nextProject = () => {
@@ -57,6 +50,8 @@ return (
             />
 
             <div className="max-w-5xl mx-auto px-6 py-12 relative z-10">
+                <h2 className="text-3xl md:text-4xl font-bold text-emerald-400 mb-4">{t.work.title}</h2>
+                <p className="text-gray-400 mb-8 max-w-2xl">{t.work.subtitle}</p>
                 <AnimatePresence mode="wait">
                     <motion.div
                         key={currentIndex}
@@ -69,15 +64,16 @@ return (
                         {/* Texto  */}
                         <div className="">
                             <div className="text-8xl font-bold text-emerald-500/20">
-                                {project.number}
+                                {String(currentIndex + 1).padStart(2, "0")}
                             </div>
 
-                            <h2 className="text-4xl font-bold mb-4 group-hover:text-emerald-400 transition-colors">
+                            <h2 className="text-2xl sm:text-3xl font-bold mb-4 group-hover:text-emerald-400 transition-colors">
                                 {project.title}
                             </h2>
 
+                            <h3 className="text-sm font-semibold text-cyan-400 mb-2">{t.work.contribution}</h3>
                             <p className="text-gray-400 mb-6 leading-relaxed group-hover:text-gray-300 transition-colors">
-                                {project.description}
+                                {project.contribution}
                             </p>
 
                             <div className="flex flex-wrap gap-2 mb-8">
@@ -92,45 +88,12 @@ return (
                                 ))}
                             </div>
 
-                            <div className="flex gap-4">
-                                <motion.a
-                                    href={project.demoLink}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    whileHover={{scale:1.1, boxShadow: "0 0 20px rgba(52, 211, 153, 0.3)"}}
-                                    whileTap={{scale: 0.95}}
-                                    className="w-12 h-12 bg-gray-800/50 backdrop-blur-sm border border-gray-700/30 rounded-full flex items-center justify-center text-gray-400 hover:text-emerald-400 hover:border-emerald-400/50 hover:bg-emerald-400/10 transition-all"
-                                >
-                                    <ArrowUpRight size={20}/>
-                                </motion.a>
-
-                                <motion.a
-                                    href={project.githubLink}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    whileHover={{scale:1.1, boxShadow: "0 0 20px rgba(52, 211, 153, 0.3)"}}
-                                    whileTap={{scale: 0.95}}
-                                    className="w-12 h-12 bg-gray-800/50 backdrop-blur-sm border border-gray-700/30 rounded-full flex items-center justify-center text-gray-400 hover:text-emerald-400 hover:border-emerald-400/50 hover:bg-emerald-400/10 transition-all"
-                                >
-                                    <FaGithub size={20} />
-                                </motion.a>
-                            </div>
                         </div>
 
-                        {/* IMAGEM */}
-                        <motion.div
-                            whileHover={{scale: 1.02}}
-                            className="relative aspect-[4/3] rounded-2xl overflow-hidden bg-gray-800/30 backdrop-blur-sm border border-gray-700/30 hover:border-emerald-500/50 hover:bg-emerald-500/5 transition-all duration-300 group"
-                        >
-                            {/* Hover Glow Effect */}
-                            <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/0 to-cyan-500/0 group-hover:from-emerald-500/10 group-hover:to-cyan-500/10 transition-all duration-300 -z-10" />
-                            <Image 
-                                src={project.image}
-                                alt={project.title}
-                                fill
-                                className="object-cover"
-                            />
-                        </motion.div>
+                        <div className="p-6 sm:p-8 rounded-2xl bg-gray-800/30 border border-emerald-400/30">
+                            <h3 className="text-lg font-semibold text-emerald-400 mb-4">{t.work.result}</h3>
+                            <p className="text-gray-300 text-lg leading-relaxed">{project.result}</p>
+                        </div>
 
                     </motion.div>
 
@@ -139,6 +102,7 @@ return (
                 <div className="flex justify-end gap-4 mt-8">
                     <motion.button
                         onClick={prevProject}
+                        aria-label={t.work.previous}
                         whileHover={{scale:1.1, boxShadow: "0 0 20px rgba(52, 211, 153, 0.3)"}}
                         whileTap={{scale: 0.9}}
                         className="w-12 h-12 bg-emerald-400 rounded-full flex items-center justify-center
@@ -148,6 +112,7 @@ return (
                     </motion.button>
                     <motion.button
                         onClick={nextProject}
+                        aria-label={t.work.next}
                         whileHover={{scale:1.1, boxShadow: "0 0 20px rgba(52, 211, 153, 0.3)"}}
                         whileTap={{scale: 0.9}}
                         className="w-12 h-12 bg-emerald-400 rounded-full flex items-center justify-center

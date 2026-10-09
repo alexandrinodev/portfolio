@@ -1,47 +1,62 @@
 {
   "nav": {
-    "home": "Home",
+    "home": "Início",
     "services": "Serviços",
-    "resume": "Resumo",
+    "resume": "Currículo",
     "work": "Projetos",
     "contact": "Contato",
-    "hireMe": "Me Contrate"
+    "hireMe": "Me Contrate",
+    "openMenu": "Abrir menu",
+    "closeMenu": "Fechar menu"
   },
   "hero": {
-    "role": "Desenvolvedor Full Stack",
+    "role": "Engenheiro de Software · Full Stack",
     "greeting": "Olá, Eu sou",
     "name": "Alex Bruno",
-    "description": "Transformo ideias em aplicações robustas, unindo interfaces modernas a sistemas de alta performance. Especialista em criar soluções completas que equilibram experiência do usuário e eficiência técnica.",
-    "download": "Download CV"
+    "description": "Desenvolvo aplicações web e desktop, APIs e integrações orientadas a eventos com React, Next.js, Node.js, Python e Go. Minha experiência combina arquitetura, automação, DevOps e qualidade de software.",
+    "download": "Baixar currículo",
+    "avatarAlt": "Foto de Alex Bruno"
   },
-"stats": {
-    "yearsExperience": "Anos de Experiência",
-    "projects": "Projetos",
-    "technologies": "Tecnologias Dominadas",
-    "commits": "Commits de Códigos"
+  "stats": {
+    "sdlc": "Anos no ciclo de desenvolvimento",
+    "applications": "Anos em aplicações web e desktop",
+    "automation": "Até de redução no tempo de execução",
+    "languages": "Idiomas: português e inglês"
   },
   "servicesTitle": "Meus Serviços",
-  "servicesSubtitle": "Especializado em criar soluções completas que equilibram experiência do usuário e eficiência técnica.",
+  "servicesSubtitle": "Aplicações web e desktop, integrações orientadas a eventos, automação com IA e qualidade de software.",
   "services": {
     "fullstack": {
       "title": "Desenvolvimento Full Stack",
-      "description": "Criação de aplicações completas, unindo front-ends dinâmicos em React/Next.js a back-ends robustos e escaláveis.",
-      "features": ["Aplicações Web & Dashboards", "Ecossistema JavaScript/TypeScript"]
+      "description": "Desenvolvimento de aplicações web e desktop, de interfaces React/Next.js a serviços e ferramentas internas.",
+      "features": [
+        "React, Next.js & Electron",
+        "Node.js, Python & Go"
+      ]
     },
     "backend": {
       "title": "Arquitetura & APIs",
-      "description": "Desenvolvimento de sistemas eficientes e integração de serviços utilizando arquiteturas modernas e seguras.",
-      "features": ["APIs com Python (FastAPI/Flask)", "Mensageria e Filas (RabbitMQ)"]
+      "description": "APIs REST e microsserviços orientados a eventos, com mensageria assíncrona e integração entre sistemas.",
+      "features": [
+        "RabbitMQ & MinIO",
+        "MongoDB & PostgreSQL"
+      ]
     },
     "automation": {
       "title": "Automação & Performance",
-      "description": "Otimização de processos e criação de automações inteligentes para aumentar a eficiência operacional de sistemas.",
-      "features": ["Automação de Fluxos", "Web Scraping & Selenium"]
+      "description": "Automação de fluxos operacionais, integração de LLMs com RAG e pipelines de entrega de software.",
+      "features": [
+        "LLMs & RAG",
+        "Docker, Ansible & CI/CD"
+      ]
     },
     "quality": {
-    "title": "Qualidade & Testes",
-    "description": "Garantia de entrega com alta confiabilidade através de testes automatizados e validação rigorosa de software.",
-    "features": ["Testes Automatizados", "QA & Garantia de Software"]
+      "title": "Qualidade & Testes",
+      "description": "Automação de testes e validação de software, APIs e sistemas Android para entregas confiáveis.",
+      "features": [
+        "Python, Selenium & UI Automator",
+        "Validação de APIs & Android"
+      ]
     }
   },
   "experience": {
@@ -53,63 +68,209 @@
   "resume": {
     "experience": [
       {
-        "period": "2025 - Present",
+        "period": "2023 – 2026",
         "title": "Software Engineer",
-        "company": "Sidia Instituto de Ciência e Tecnologia - SIDIA",
-        "description": "Desenvolvimento de aplicações usando Nextjs, Javascript, Node.js, Python, Go"
+        "company": "SIDIA Instituto de Ciência e Tecnologia",
+        "description": "Desenvolvimento de aplicações web e desktop, arquitetura e integrações em equipes ágeis.",
+        "achievements": [
+          "Definição e implementação de microsserviços orientados a eventos, APIs REST e ingestão assíncrona com RabbitMQ.",
+          "Gestão centralizada de logs, artefatos e dados não estruturados com MinIO e MongoDB.",
+          "Desenvolvimento de serviços com Node.js/TypeScript, Python (FastAPI, Flask, Django) e Go (Gin), e interfaces com React, Next.js e Electron.",
+          "Criação de pipelines CI/CD, provisionamento de ambientes e automação de deploy com Docker e Ansible.",
+          "Automações e integração de LLMs (Claude e Codex) com RAG nos fluxos da equipe, reduzindo o tempo de execução em até 60%.",
+          "Automação de testes com Java/UI Automator, Python e Selenium; acompanhamento de entregas com Scrum/Kanban e Jira."
+        ]
       },
       {
-        "period": "2022 - 2025",
-        "title": "Test Developer Jr.",
-        "company": "Sidia Instituto de Ciência e Tecnologia - SIDIA",
-        "description": "Testes de compatibilidade, caixa preta, regressão"
+        "period": "2022 – 2023",
+        "title": "Tester Engineer",
+        "company": "SIDIA Instituto de Ciência e Tecnologia",
+        "description": "Qualidade e validação de releases Android para a América Latina.",
+        "achievements": [
+          "Garantia de conformidade dos releases Android na América Latina, mitigando riscos de implantação.",
+          "Otimização do ciclo de aprovação de builds, logística de amostras de hardware e resolução de problemas com Jira.",
+          "Execução de rotinas CTS e GTS em Windows, Linux e Android, além de validação de APIs e componentes com CTS Verifier e ATM."
+        ]
       }
     ],
     "education": [
       {
-        "period": "2017 - 2020",
-        "title": "Ciência da Computação",
+        "period": "Conclusão prevista: outubro de 2027",
+        "title": "Pós-graduação em Engenharia de Software com IA Aplicada",
+        "institution": "UNIPDS",
+        "description": "Em andamento."
+      },
+      {
+        "period": "2024 – 2025",
+        "title": "Desenvolvimento Android para Sistemas Embarcados (AOSP)",
+        "institution": "Icomp/UFAM",
+        "description": "Formação em desenvolvimento Android para sistemas embarcados."
+      },
+      {
+        "period": "2017 – 2020",
+        "title": "Bacharelado em Ciência da Computação",
         "institution": "UNINORTE",
-        "description": "Bacharelado com foco em desenvolvimento web"
+        "description": "Graduação em Ciência da Computação."
       }
     ],
-    "skills": {
-      "frontend": ["React", "Next.js", "TypeScript"],
-      "backend": ["Node.js", "Python", "PostgreSQL", "MongoDB"],
-      "devops": ["Git", "Docker", "Kubernetes", "CI/CD"],
-      "softSkills": ["Comunicação", "Liderança", "Trabalho em Equipe"]
-    },
+    "skills": [
+      {
+        "title": "Frontend & Desktop",
+        "items": [
+          "React",
+          "Next.js",
+          "TypeScript",
+          "JavaScript",
+          "HTML",
+          "CSS",
+          "Electron"
+        ]
+      },
+      {
+        "title": "Backend & APIs",
+        "items": [
+          "Node.js",
+          "Python",
+          "FastAPI",
+          "Flask",
+          "Django",
+          "Go / Gin",
+          "Java",
+          "REST"
+        ]
+      },
+      {
+        "title": "Arquitetura & Dados",
+        "items": [
+          "Microsserviços",
+          "Arquitetura orientada a eventos",
+          "RabbitMQ",
+          "MinIO",
+          "MongoDB",
+          "PostgreSQL",
+          "MySQL",
+          "Qdrant"
+        ]
+      },
+      {
+        "title": "DevOps & Infraestrutura",
+        "items": [
+          "Docker",
+          "Kubernetes",
+          "Ansible",
+          "GitHub Actions",
+          "CI/CD",
+          "Linux / Unix"
+        ]
+      },
+      {
+        "title": "Qualidade & Testes",
+        "items": [
+          "Selenium",
+          "Cypress",
+          "Postman",
+          "Insomnia",
+          "Pytest",
+          "Jest",
+          "UI Automator"
+        ]
+      },
+      {
+        "title": "IA & Automação",
+        "items": [
+          "LLMs",
+          "Claude",
+          "OpenAI Codex",
+          "RAG",
+          "Machine Learning"
+        ]
+      },
+      {
+        "title": "Métodos & Colaboração",
+        "items": [
+          "Scrum",
+          "Kanban",
+          "Jira",
+          "Confluence",
+          "Git",
+          "GitHub"
+        ]
+      }
+    ],
     "about": {
-      "description": "Desenvolvedor Full Stack apaixonado por criar soluções inovadoras e escaláveis. Experiência em desenvolvimento web moderno e práticas ágeis.",
-      "interests": ["Open Source", "UI/UX Design", "Cloud Computing", "Machine Learning"]
-    }
-  },
-  "projects": {
-    "hardware": {
-      "title": "Hardware Detection Agent",
-      "description": "Um agente desktop robusto que detecta componentes de hardware em tempo real e envia os dados para um dashboard centralizado."
+      "description": "Engenheiro de Software Full Stack com 5 anos de experiência no ciclo de desenvolvimento de software, incluindo 4 anos dedicados a aplicações web e desktop. Atuei no SIDIA entre 2022 e 2026, combinando desenvolvimento, arquitetura, DevOps e qualidade em equipes Scrum/Kanban.",
+      "interests": [
+        "Arquitetura de software",
+        "Automação",
+        "IA aplicada",
+        "Qualidade de software"
+      ],
+      "interestsTitle": "Interesses"
     },
-    "qa": {
-      "title": "QA Automation Dashboard",
-      "description": "Plataforma para monitoramento de testes automatizados e validação de sistema, otimizando o workflow de Quality Assurance."
-    },
-    "ecommerce": {
-      "title": "Fullstack E-commerce API",
-      "description": "API escalável com integração de filas para processamento de pedidos e gerenciamento de estoque em tempo real."
-    }
+    "languagesTitle": "Idiomas",
+    "languages": [
+      "Português — Nativo",
+      "Inglês — B2"
+    ]
   },
+  "projects": [
+    {
+      "title": "Microsserviços & Integrações",
+      "contribution": "Definição e implementação de arquitetura orientada a eventos e integração via APIs REST e RabbitMQ.",
+      "result": "Ingestão assíncrona de dados e gestão centralizada de logs e artefatos com MinIO e MongoDB.",
+      "technologies": [
+        "Node.js",
+        "Python",
+        "Go",
+        "RabbitMQ",
+        "MinIO",
+        "MongoDB"
+      ]
+    },
+    {
+      "title": "Aplicações Web & Desktop",
+      "contribution": "Desenvolvimento de interfaces e ferramentas internas de apoio operacional com React, Next.js e Electron.",
+      "result": "Entrega de aplicações web e desktop multiplataforma para apoiar a operação da equipe.",
+      "technologies": [
+        "React",
+        "Next.js",
+        "TypeScript",
+        "Electron"
+      ]
+    },
+    {
+      "title": "Automação, IA & DevOps",
+      "contribution": "Criação de automações e integração de LLMs com RAG nos fluxos da equipe, além de pipelines CI/CD com Docker e Ansible.",
+      "result": "Redução de até 60% no tempo de execução dos fluxos automatizados, conforme o resultado registrado no currículo.",
+      "technologies": [
+        "LLMs",
+        "RAG",
+        "Docker",
+        "Ansible",
+        "CI/CD"
+      ]
+    }
+  ],
   "contact": {
     "phone": "Telefone",
     "email": "E-mail",
     "address": "Endereço",
-    "button-send": "Enviar Mensagem",
-    "first-name": "Nome",
-    "first-name-required": "O nome é obrigatório",
-    "last-name": "Sobrenome",
-    "last-name-required": "O sobrenome é obrigatório",
-    "email-address": "Endereço de e-mail",
-    "phone-number": "Número de telefone",
-    "select-service": "Selecione um serviço",
-    "type-message": "Digite sua mensagem aqui"
-    }
+    "title": "Vamos conversar?",
+    "description": "Tem um projeto em mente? Entre em contato pelo WhatsApp para conversarmos sobre sua ideia.",
+    "whatsappButton": "Conversar no WhatsApp",
+    "whatsappMessage": "Olá, Alex! Vi seu portfólio e gostaria de conversar sobre um projeto."
+  },
+  "language": {
+    "switch": "Mudar para inglês"
+  },
+  "work": {
+    "previous": "Projeto anterior",
+    "next": "Próximo projeto",
+    "demo": "Ver demonstração",
+    "code": "Ver código no GitHub",
+    "title": "Entregas profissionais",
+    "subtitle": "Experiências realizadas no SIDIA entre 2023 e 2026, conforme meu currículo.",
+    "contribution": "Minha contribuição",
+    "result": "Resultado"
+  }
 }

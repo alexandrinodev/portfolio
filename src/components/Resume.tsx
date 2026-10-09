@@ -1,10 +1,7 @@
 "use client"
-import { skillsData } from '@/app/lib/constants'
 import { AnimatePresence, motion } from 'framer-motion'
-import Image from 'next/image'
 import { useState } from 'react'
 import { useLanguage } from '@/app/i18n/LanguageContext'
-import CountUp from './CountUp'
 
 export default function Resume() {
     const { t } = useLanguage()
@@ -21,7 +18,7 @@ export default function Resume() {
         switch(activateTab){
             case "experiencias":
                 return(
-                    <div className='grid md:grid-cols-2 gap-6 lg:gap-8'>
+                    <div className='grid gap-6 lg:gap-8'>
                         {t.resume.experience.map((exp, id) => (
                             <motion.div
                                 key={id}
@@ -51,6 +48,9 @@ export default function Resume() {
 
                                 <p className='text-cyan-400 mt-1 text-sm'>{exp.company}</p>
                                 <p className="text-gray-400 mt-3 leading-relaxed group-hover:text-gray-300 transition-colors">{exp.description}</p>
+                                <ul className="mt-4 space-y-3 list-disc pl-5 text-sm text-gray-300 leading-relaxed">
+                                    {exp.achievements.map(achievement => <li key={achievement}>{achievement}</li>)}
+                                </ul>
                                 
                                 {/* Bottom Border Animation */}
                                 <div className="absolute bottom-0 left-0 h-2 w-full bg-gradient-to-r from-emerald-500 to-cyan-500 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 rounded-b-2xl" />
@@ -60,7 +60,7 @@ export default function Resume() {
                 )
             case "educacao":
                 return(
-                    <div className='grid md:grid-cols-2 gap-6 lg:gap-8'>
+                    <div className='grid gap-6 lg:gap-8'>
                         {t.resume.education.map((education, id) => (
                             <motion.div
                                 key={id}
@@ -99,35 +99,14 @@ export default function Resume() {
                 )
             case "skills":
                 return(
-                    <div className='grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 md:gap-6 mt-10 lg:mt-12'>
-                        {skillsData.map((skill, index) => (
-                            <motion.div
-                                key={index}
-                                initial={{ opacity: 0, y: 20, scale: 0.95 }}
-                                animate={{ opacity: 1, y: 0, scale: 1 }}
-                                transition={{ delay: index * 0.05 }}
-                                whileHover={{ y: -8, scale: 1.05 }}
-                                className="group relative p-5 rounded-2xl bg-gray-800/30 backdrop-blur-sm border border-gray-700/30 hover:border-emerald-500/50 hover:bg-emerald-500/5 transition-all duration-300"
-                            >
-                                {/* Hover Glow Effect */}
-                                <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-emerald-500/0 to-cyan-500/0 group-hover:from-emerald-500/10 group-hover:to-cyan-500/10 transition-all duration-300 -z-10" />
-                                
-                                <div className='flex flex-col items-center'>
-                                    <Image  
-                                        src={skill.icon}
-                                        alt={skill.name}
-                                        width={96}
-                                        height={96}
-                                        className='w-full h-full object-contain'
-                                    />
-                                    <span className="text-sm text-gray-400 mt-3 group-hover:text-emerald-400 transition-colors text-center">
-                                        {skill.name}
-                                    </span>
+                    <div className="space-y-5">
+                        {t.resume.skills.map(group => (
+                            <div key={group.title} className="p-5 rounded-2xl bg-gray-800/30 border border-gray-700/30">
+                                <h3 className="text-lg font-bold text-emerald-400 mb-3">{group.title}</h3>
+                                <div className="flex flex-wrap gap-2">
+                                    {group.items.map(item => <span key={item} className="text-sm text-gray-300 bg-gray-800 px-3 py-1 rounded-full">{item}</span>)}
                                 </div>
-                                
-                                {/* Bottom Border Animation */}
-                                <div className="absolute bottom-0 left-0 h-2 w-full bg-gradient-to-r from-emerald-500 to-cyan-500 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 rounded-b-2xl" />
-                            </motion.div>
+                            </div>
                         ))}
                     </div>
                 )
@@ -136,7 +115,7 @@ export default function Resume() {
                     <motion.div
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
-                        className='grid md:grid-cols-2 gap-6 lg:gap-8'
+                        className='grid gap-6 lg:gap-8'
                     >
                         <motion.div
                             initial={{ opacity: 0, y: 20 }}
@@ -149,6 +128,10 @@ export default function Resume() {
                             
                             <h3 className='text-xl font-bold mb-4 group-hover:text-emerald-400 transition-colors'>{t.experience.aboutMe}</h3>
                             <p className='text-gray-400 leading-relaxed group-hover:text-gray-300 transition-colors'>{t.resume.about.description}</p>
+                            <h3 className="text-xl font-bold mt-6 mb-3 text-emerald-400">{t.resume.languagesTitle}</h3>
+                            <ul className="space-y-2 text-gray-300">
+                                {t.resume.languages.map(language => <li key={language}>{language}</li>)}
+                            </ul>
                             
                             {/* Bottom Border Animation */}
                             <div className="absolute bottom-0 left-0 h-2 w-full bg-gradient-to-r from-emerald-500 to-cyan-500 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 rounded-b-2xl" />
@@ -164,7 +147,7 @@ export default function Resume() {
                             {/* Hover Glow Effect */}
                             <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-cyan-500/0 to-emerald-500/0 group-hover:from-cyan-500/5 group-hover:to-emerald-500/5 transition-all duration-300 -z-10" />
                             
-                            <h3 className='text-xl font-bold mb-4 group-hover:text-cyan-400 transition-colors'>Interesses</h3>
+                            <h3 className='text-xl font-bold mb-4 group-hover:text-cyan-400 transition-colors'>{t.resume.about.interestsTitle}</h3>
                             <div className='flex flex-wrap gap-2'>{t.resume.about.interests.map((interest,index) => (
                                 <motion.span  
                                     key={index}
@@ -216,7 +199,7 @@ return (
             />
 
             <div className="max-w-6xl mx-auto px-6 py-12 relative z-10">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
+                <div className="grid grid-cols-1 lg:grid-cols-[280px_minmax(0,1fr)] gap-8 lg:gap-12">
 
                     {/* Sidebar */}
                     <div className="space-y-4">
@@ -235,7 +218,7 @@ return (
                                     ease: "linear"
                                 }}
                             >
-                                {t.nav.hireMe}
+                                {t.nav.resume}
                             </motion.span>
                         </motion.h2>
 
@@ -249,6 +232,7 @@ return (
                                     whileHover={{ scale: 1.02, x: 5 }}
                                     whileTap={{ scale: 0.98 }}
                                     onClick={() => SetActivateTab(tab.id)}
+                                    aria-pressed={tab.id === activateTab}
                                     className={`w-full max-w-[350px] p-4 text-left rounded-xl transition-all duration-300 backdrop-blur-sm
                                     ${tab.id === activateTab
                                             ? "bg-cyan-500/20 text-emerald-400 border border-emerald-400/50 shadow-lg shadow-emerald-500/10"
@@ -278,7 +262,9 @@ return (
                         </motion.h2>
 
                         <AnimatePresence mode="wait">
-                            {renderContent()}
+                            <motion.div key={activateTab} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+                                {renderContent()}
+                            </motion.div>
                         </AnimatePresence>
                     </div>
 
