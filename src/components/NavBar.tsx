@@ -24,14 +24,14 @@ const scrollToSection = (id: string) => {
 }
 
 export default function NavBar() {
-    const { t } = useLanguage()
+    const { t, language } = useLanguage()
     const pathname = usePathname()
     const router = useRouter()
     const [isMenuOpen, setIsMenuOpen] = useState(false)
 
     const handleNavClick = (id: string) => {
-        if (pathname !== "/") {
-            router.push(id === "/" ? "/" : `/#${id.slice(1)}`)
+        if (pathname !== `/${language}`) {
+            router.push(id === "/" ? `/${language}` : `/${language}#${id.slice(1)}`)
             setIsMenuOpen(false)
             return
         }

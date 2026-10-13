@@ -1,7 +1,8 @@
+import { notFound } from "next/navigation";
 import { JetBrains_Mono } from "next/font/google"
-import "./globals.css";
+import "../globals.css";
 import NavBar from "@/components/NavBar";
-import { LanguageProvider } from "./i18n/LanguageContext";
+import { LanguageProvider } from "../i18n/LanguageContext";
 
 
 const jetbrainsMono = JetBrains_Mono({
@@ -10,15 +11,20 @@ const jetbrainsMono = JetBrains_Mono({
   variable: "--front-jetbarins-mono"
 })
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
+  params,
 }: Readonly<{
   children: React.ReactNode;
+  params: Promise<{ lang: string }>;
 }>) {
+  const { lang } = await params;
+  if (lang !== "pt" && lang !== "en") notFound();
+
   return (
-    <html lang="pt-BR">
+    <html lang={lang === "pt" ? "pt-BR" : "en"}>
         <body className={jetbrainsMono.className}>
-          <LanguageProvider>
+          <LanguageProvider language={lang}>
             <NavBar />
             <main className="min-h-screen">
               {children}
