@@ -172,7 +172,7 @@ portfolio/
 
 ## 👨‍💻 Sobre Mim
 
-Sou **Alex Bruno**, Engenheiro de Software Full Stack com 5 anos no ciclo de desenvolvimento de software e 4 anos dedicados a aplicações web e desktop. Atuei no SIDIA como **Tester Engineer (2022–2023)** e **Software Engineer (2023–2026)**, trabalhando com arquitetura orientada a eventos, APIs, automação, DevOps e qualidade.
+Sou **Alex Alexandrino**, Engenheiro de Software Full Stack com 5 anos no ciclo de desenvolvimento de software e 4 anos dedicados a aplicações web e desktop. Atuei no SIDIA como **Tester Engineer (2022–2023)** e **Software Engineer (2023–2026)**, trabalhando com arquitetura orientada a eventos, APIs, automação, DevOps e qualidade.
 
 Minha formação inclui Ciência da Computação na UNINORTE (2017–2020), AOSP no Icomp/UFAM (2024–2025) e pós-graduação em Engenharia de Software com IA Aplicada na UNIPDS, em andamento com conclusão prevista para outubro de 2027.
 
@@ -203,6 +203,6 @@ Este projeto está sob a licença MIT. Veja o arquivo [LICENSE](LICENSE) para ma
 
 <div align="center">
 
-**Desenvolvido com 💚 por [Alex Bruno](https://github.com/alexandrinodev)**
+**Desenvolvido com 💚 por [Alex Alexandrino](https://github.com/alexandrinodev)**
 
 </div>

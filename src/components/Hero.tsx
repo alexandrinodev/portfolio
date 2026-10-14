@@ -41,25 +41,15 @@ export default function Hero() {
                         initial={{ opacity: 0, x: -50 }}
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ duration: 0.8, ease: "easeOut" }}
-                        className="flex-1"
+                        className="min-w-0 w-full flex-1"
                     >
-                        {/* Role Badge with Glassmorphism */}
-                        <motion.div
-                            initial={{ opacity: 0, y: 10 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ delay: 0.2 }}
-                            className="mb-6 inline-block"
-                        >
-                            <span className="px-4 py-2 rounded-full bg-gray-800/50 backdrop-blur-sm border border-gray-700/50 text-gray-300 text-sm font-medium">
-                                {t.hero.role}
-                            </span>
-                        </motion.div>
 
-                        <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 text-center lg:text-left leading-tight">
+
+                        <h1 className="text-[clamp(1.25rem,7.2vw,3rem)] lg:text-[clamp(1rem,3.5vw,3rem)] font-bold mb-6 text-center lg:text-left leading-tight">
                             {t.hero.greeting}
                             {/* Animated Gradient Text */}
                             <motion.span 
-                                className="block mt-2 bg-gradient-to-r from-emerald-400 via-cyan-400 to-emerald-400 bg-[length:200%_auto] bg-clip-text text-transparent"
+                                className="block mt-2 whitespace-nowrap bg-gradient-to-r from-emerald-400 via-cyan-400 to-emerald-400 bg-[length:200%_auto] bg-clip-text text-transparent"
                                 animate={{
                                     backgroundPosition: ["0% center", "100% center", "0% center"]
                                 }}
@@ -132,7 +122,7 @@ export default function Hero() {
                             duration: 1,
                             ease: "easeOut"
                         }}
-                        className="relative w-full lg:flex-1 flex justify-center"
+                        className="relative w-full lg:flex-1 flex flex-col items-center justify-center"
                     >
                         {/* Glow Effect Behind Avatar */}
                         <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/20 via-cyan-500/20 to-transparent rounded-full blur-3xl scale-75" />

@@ -11,8 +11,8 @@ export function shareMetadata(
     width: 1291,
     height: 620,
     alt: lang === "pt"
-      ? "Portfólio de Alex Bruno — Engenheiro de Software Full Stack"
-      : "Alex Bruno’s Portfolio — Full Stack Software Engineer",
+      ? "Portfólio de Alex Alexandrino — Engenheiro de Software Full Stack"
+      : "Alex Alexandrino’s Portfolio — Full Stack Software Engineer",
   }
 
   return {

@@ -12,10 +12,10 @@
   "hero": {
     "role": "Engenheiro de Software · Full Stack",
     "greeting": "Olá, Eu sou",
-    "name": "Alex Bruno",
+    "name": "Alex Alexandrino",
     "description": "Desenvolvo aplicações web e desktop, APIs e integrações orientadas a eventos com React, Next.js, Node.js, Python e Go. Minha experiência combina arquitetura, automação, DevOps e qualidade de software.",
     "download": "Baixar currículo",
-    "avatarAlt": "Foto de Alex Bruno"
+    "avatarAlt": "Foto de Alex Alexandrino"
   },
   "stats": {
     "sdlc": "Anos no ciclo de desenvolvimento",
