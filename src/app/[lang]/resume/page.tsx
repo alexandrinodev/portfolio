@@ -1,3 +1,4 @@
+import { shareMetadata } from "@/app/lib/shareMetadata";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Resume from "@/components/Resume";
@@ -10,9 +11,13 @@ export async function generateMetadata({
   const { lang } = await params;
   if (lang !== "pt" && lang !== "en") notFound();
 
+  const title = lang === "en" ? "Resume" : "Currículo";
+  const description = lang === "en" ? "Explore Alex Alexandrino’s professional experience, education and skills in full stack software engineering." : "Conheça a experiência profissional, formação e habilidades de Alex Alexandrino em engenharia de software Full Stack.";
+
   return {
-    title: lang === "en" ? "Resume" : "Currículo",
-    description: lang === "en" ? "Explore Alex Alexandrino’s professional experience, education and skills in full stack software engineering." : "Conheça a experiência profissional, formação e habilidades de Alex Alexandrino em engenharia de software Full Stack.",
+    title,
+    description,
+    ...shareMetadata(lang, `${title} | Alex Alexandrino`, description, "/resume"),
   };
 }
 

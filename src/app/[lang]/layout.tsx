@@ -1,3 +1,4 @@
+import { shareMetadata } from "@/app/lib/shareMetadata";
 import { notFound } from "next/navigation";
 import { JetBrains_Mono } from "next/font/google"
 import "../globals.css";
@@ -33,6 +34,7 @@ export async function generateMetadata({
       template: "%s | Alex Alexandrino",
     },
     description: content.description,
+    ...shareMetadata(lang, content.title, content.description),
   };
 }
 
