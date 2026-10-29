@@ -1,4 +1,4 @@
-import { ChatbotError, generateChatbotReply, type ChatLanguage } from "@/app/lib/chatbot/provider";
+import { ChatbotError, generateChatbotReply, streamChatbotReply, type ChatLanguage } from "@/app/lib/chatbot/provider";
 import { checkChatRateLimit } from "@/app/lib/chatbot/rate-limit";
 import { ChatRequestError, readChatRequest } from "@/app/lib/chatbot/request";
 
@@ -35,6 +35,12 @@ function errorResponse(code: keyof typeof errors, language: ChatLanguage, retryA
 export async function POST(request: Request): Promise<Response> {
   let language: ChatLanguage = request.headers.get("accept-language")?.startsWith("en") ? "en" : "pt";
 
+  const startedAt = Date.now();
+  const timings: Record<string, number> = {};
+  const recordTiming = (stage: string, milliseconds: number) => { timings[stage] = milliseconds; };
+  const logTiming = (outcome: string) => {
+    console.info("[chatbot] latency", { ...timings, total: Date.now() - startedAt, outcome });
+  };
   try {
     if (request.signal.aborted) throw new ChatbotError("aborted");
     if (process.env.CHATBOT_ENABLED === "false") throw new ChatbotError("unavailable");
@@ -42,12 +48,61 @@ export async function POST(request: Request): Promise<Response> {
     const input = await readChatRequest(request);
     language = input.language;
 
+    const redisStartedAt = Date.now();
     const retryAfter = await checkChatRateLimit(request.signal);
-    if (retryAfter > 0) return errorResponse("rate_limit", language, retryAfter);
+    recordTiming("redis", Date.now() - redisStartedAt);
+    if (retryAfter > 0) {
+      logTiming("rate_limit");
+      return errorResponse("rate_limit", language, retryAfter);
+    }
 
-    const reply = await generateChatbotReply({ ...input, signal: request.signal });
+    if (request.headers.get("accept")?.includes("application/x-ndjson")) {
+      const controller = new AbortController();
+      const signal = AbortSignal.any([request.signal, controller.signal]);
+      const iterator = streamChatbotReply({ ...input, signal, onTiming: recordTiming });
+      // Antes de enviar cabeçalhos, preservar os status HTTP de falhas iniciais.
+      const first = await iterator.next();
+      const encoder = new TextEncoder();
+      let pending = first;
+      let cancelled = false;
+      const body = new ReadableStream<Uint8Array>({
+        async pull(output) {
+          try {
+            if (pending.done) {
+              output.enqueue(encoder.encode(JSON.stringify({ type: "done" }) + "\n"));
+              output.close();
+              logTiming("success");
+              return;
+            }
+            output.enqueue(encoder.encode(JSON.stringify({ type: "delta", text: pending.value }) + "\n"));
+            pending = await iterator.next();
+          } catch (error) {
+            if (cancelled) return;
+            const code = error instanceof ChatbotError ? error.code : "unavailable";
+            output.enqueue(encoder.encode(JSON.stringify({ type: "error", code }) + "\n"));
+            output.close();
+            logTiming(code);
+          }
+        },
+        async cancel() {
+          cancelled = true;
+          controller.abort();
+          await iterator.return(undefined);
+          logTiming("aborted");
+        },
+      });
+      return new Response(body, { headers: {
+        "Content-Type": "application/x-ndjson; charset=utf-8",
+        "Cache-Control": "no-store, no-transform",
+        "X-Accel-Buffering": "no",
+        "Server-Timing": `redis;dur=${timings.redis}, context;dur=${timings.context}, firstText;dur=${timings.firstText}`,
+      } });
+    }
+    const reply = await generateChatbotReply({ ...input, signal: request.signal, onTiming: recordTiming });
+    logTiming("success");
     return Response.json({ reply }, { headers: { "Cache-Control": "no-store" } });
   } catch (error) {
+    logTiming(error instanceof ChatbotError ? error.code : "unavailable");
     if (request.signal.aborted) return errorResponse("aborted", language);
     if (error instanceof ChatbotError) {
       return errorResponse(error.code, language);

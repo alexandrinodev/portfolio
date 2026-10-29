@@ -5,6 +5,8 @@ import { Bot, LoaderCircle, MessageCircle, Send, X } from "lucide-react";
 import { useLanguage } from "@/app/i18n/LanguageContext";
 import { buildRequestMessages, type ConversationMessage } from "@/app/lib/chatbot/conversation";
 
+import { readChatStream } from "@/app/lib/chatbot/stream";
+
 type ErrorCode = "unavailable" | "rate_limit" | "timeout" | "invalid_response" | "invalid_input";
 
 export default function Chatbot() {
@@ -48,6 +50,7 @@ export default function Chatbot() {
     // A ref bloqueia outro envio imediatamente, antes da próxima renderização.
     if (!content || activeRequest.current) return;
     const message: ConversationMessage = { id: nextMessageId.current++, role: "user", content };
+    const replyId = nextMessageId.current++;
     const controller = new AbortController();
     activeRequest.current = controller;
     let timedOut = false;
@@ -65,12 +68,12 @@ export default function Chatbot() {
     try {
       const response = await fetch("/api/chat", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", Accept: "application/x-ndjson" },
         body: JSON.stringify({ language, messages: buildRequestMessages(messages, content) }),
         signal: controller.signal,
       });
-      const data: unknown = await response.json();
       if (!response.ok) {
+        const data: unknown = await response.json();
         let code: ErrorCode = "unavailable";
         if (typeof data === "object" && data !== null && "error" in data) {
           const failure = data.error;
@@ -82,19 +85,22 @@ export default function Chatbot() {
         }
         throw new Error(code);
       }
-      if (
-        typeof data !== "object" || data === null || !("reply" in data) ||
-        typeof data.reply !== "string" || !data.reply.trim()
-      ) throw new Error("invalid_response");
+      if (!response.body || !response.headers.get("content-type")?.includes("application/x-ndjson")) {
+        throw new Error("invalid_response");
+      }
+      await readChatStream(response.body, (text) => {
+        controller.signal.throwIfAborted();
+        setMessages((previous) => {
+          const existing = previous.find((item) => item.id === replyId);
+          return existing
+            ? previous.map((item) => item.id === replyId ? { ...item, content: item.content + text } : item)
+            : [...previous, { id: replyId, role: "assistant", content: text }];
+        });
+      });
       controller.signal.throwIfAborted();
-
-      const reply: ConversationMessage = {
-        id: nextMessageId.current++, role: "assistant", content: data.reply,
-      };
-      setMessages((previous) => [...previous, reply]);
     } catch (failure) {
       // Retirar a pergunta sem resposta e restaurar o rascunho permite tentar novamente.
-      setMessages((previous) => previous.filter((item) => item.id !== message.id));
+      setMessages((previous) => previous.filter((item) => item.id !== message.id && item.id !== replyId));
       setDraft(content);
       if (timedOut) setError("timeout");
       else if (!controller.signal.aborted) {
@@ -184,7 +190,7 @@ export default function Chatbot() {
                 </p>
               </div>
             ))}
-            {isLoading && (
+            {isLoading && messages.at(-1)?.role !== "assistant" && (
               <p className="flex items-center gap-2 text-sm text-gray-400">
                 <LoaderCircle size={16} className="animate-spin motion-reduce:animate-none" aria-hidden="true" />
                 {t.chatbot.loading}

@@ -37,6 +37,7 @@ type GenerateReplyOptions = {
   messages: ChatMessage[];
   language: ChatLanguage;
   signal?: AbortSignal;
+  onTiming?: (stage: string, milliseconds: number) => void;
 };
 
 // Compartilhado com a rota para manter os mesmos limites nas duas camadas.
@@ -61,11 +62,12 @@ export function validateChatInput(messages: ChatMessage[], language: ChatLanguag
   }
 }
 
-export async function generateChatbotReply({
+async function* generateReply({
   messages,
   language,
   signal,
-}: GenerateReplyOptions): Promise<string> {
+  onTiming,
+}: GenerateReplyOptions, streaming: boolean): AsyncGenerator<string> {
   validateChatInput(messages, language);
 
   const apiKey = process.env.GEMINI_API_KEY?.trim();
@@ -91,6 +93,7 @@ export async function generateChatbotReply({
       getPublicProfile(),
     ]);
     requestSignal.throwIfAborted();
+    onTiming?.("context", Date.now() - startedAt);
 
     const ai = new GoogleGenAI({
       apiKey,
@@ -98,7 +101,8 @@ export async function generateChatbotReply({
       httpOptions: { timeout: GEMINI_TIMEOUT_MS, retryOptions: { attempts: 1 } },
     });
 
-    const response = await ai.models.generateContent({
+    const generationStartedAt = Date.now();
+    const params = {
       model,
       // O SDK chama o papel de resposta do assistente de "model".
       contents: messages.map((message) => ({
@@ -113,6 +117,7 @@ export async function generateChatbotReply({
           "<public_profile>",
           profile,
           "</public_profile>",
+          "Para perguntas factuais simples, responda diretamente em 2 a 4 frases curtas, sem introdução nem repetir a pergunta. Liste somente tecnologias relevantes. Amplie apenas quando solicitado.",
         ].join("\n\n"),
         maxOutputTokens: 1024,
         // Perguntas curtas sobre fatos do perfil não exigem raciocínio prolongado.
@@ -121,18 +126,36 @@ export async function generateChatbotReply({
         abortSignal: requestSignal,
         automaticContinuation: false,
       },
-    });
-
-    requestSignal.throwIfAborted();
-    const candidate = response.candidates?.[0];
-    const text = response.text?.trim();
-
-    // Respostas bloqueadas, vazias ou interrompidas não viram resposta ao visitante.
-    if (!text || candidate?.finishReason !== FinishReason.STOP) {
-      throw new ChatbotError("invalid_response");
+    };
+    let hasText = false;
+    let finishReason: FinishReason | undefined;
+    try {
+      const responses = streaming
+        ? await ai.models.generateContentStream(params)
+        : [await ai.models.generateContent(params)];
+      for await (const response of responses) {
+        requestSignal.throwIfAborted();
+        const candidate = response.candidates?.[0];
+        if (candidate?.finishReason) finishReason = candidate.finishReason;
+        if (finishReason && finishReason !== FinishReason.STOP) {
+          throw new ChatbotError("invalid_response");
+        }
+        const text = response.text;
+        if (text) {
+          if (!hasText && text.trim()) {
+            onTiming?.("firstText", Date.now() - generationStartedAt);
+          }
+          hasText ||= Boolean(text.trim());
+          yield text;
+        }
+      }
+      requestSignal.throwIfAborted();
+      if (!hasText || finishReason !== FinishReason.STOP) {
+        throw new ChatbotError("invalid_response");
+      }
+    } finally {
+      onTiming?.("gemini", Date.now() - generationStartedAt);
     }
-
-    return text;
   } catch (error) {
     if (signal?.aborted) throw new ChatbotError("aborted");
     if (timeoutSignal.aborted) {
@@ -165,4 +188,15 @@ export async function generateChatbotReply({
     // Não repassar a mensagem original do SDK, que pode conter detalhes internos.
     throw new ChatbotError("unavailable");
   }
+}
+
+
+export async function generateChatbotReply(options: GenerateReplyOptions): Promise<string> {
+  let reply = "";
+  for await (const text of generateReply(options, false)) reply += text;
+  return reply.trim();
+}
+
+export function streamChatbotReply(options: GenerateReplyOptions): AsyncGenerator<string> {
+  return generateReply(options, true);
 }

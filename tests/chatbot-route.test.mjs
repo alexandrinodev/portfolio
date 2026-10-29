@@ -21,6 +21,8 @@ registerHooks({
 const { POST } = await import("../src/app/api/chat/route.ts");
 const { checkChatRateLimit } = await import("../src/app/lib/chatbot/rate-limit.ts");
 
+const { readChatStream } = await import("../src/app/lib/chatbot/stream.ts");
+
 const validBody = { language: "pt", messages: [{ role: "user", content: "Alex utiliza Python?" }] };
 let geminiCalls;
 let redisCalls;
@@ -29,6 +31,9 @@ let geminiStatus;
 let geminiResult;
 let redisResult;
 let redisStatus;
+let streamChunks;
+let streamGate;
+let geminiSignal;
 
 function request(body = validBody, headers = {}) {
   return new Request("http://localhost/api/chat", {
@@ -48,6 +53,8 @@ function reset() {
   delete process.env.CHATBOT_REQUESTS_PER_MINUTE;
   delete process.env.CHATBOT_REQUESTS_PER_DAY;
   delete process.env.VERCEL;
+  streamChunks = undefined;
+  streamGate = undefined;
   geminiCalls = 0;
   redisCalls = 0;
   geminiStatus = 200;
@@ -70,7 +77,20 @@ globalThis.fetch = async (url, init) => {
   }
   assert.ok(String(url).startsWith("https://generativelanguage.googleapis.com/"));
   geminiCalls++;
+  geminiSignal = init.signal;
   sentToGemini = JSON.parse(init.body);
+  if (String(url).includes("streamGenerateContent") && geminiStatus === 200) {
+    const chunks = streamChunks ?? [geminiResult];
+    const gate = streamGate;
+    return new Response(new ReadableStream({ async start(controller) {
+      const encoder = new TextEncoder();
+      for (let index = 0; index < chunks.length; index++) {
+        if (index && gate) await gate;
+        controller.enqueue(encoder.encode(`data: ${JSON.stringify(chunks[index])}\n\n`));
+      }
+      controller.close();
+    } }), { headers: { "Content-Type": "text/event-stream" } });
+  }
   return Response.json(geminiResult, { status: geminiStatus });
 };
 
@@ -90,6 +110,84 @@ test("rota do chatbot com HTTP simulado", async (t) => {
     assert.equal(sentToGemini.tools, undefined);
     assert.equal(sentToGemini.generationConfig.thinkingConfig.thinkingLevel, "LOW");
     assert.equal(sentToGemini.generationConfig.maxOutputTokens, 1024);
+  });
+
+  await t.test("stream entrega texto antes de concluir e sinaliza conclusão", async () => {
+    reset();
+    let release;
+    streamGate = new Promise((resolve) => { release = resolve; });
+    streamChunks = [
+      { candidates: [{ content: { parts: [{ text: "Alex " }] } }] },
+      { candidates: [{ content: { parts: [{ text: "utiliza Python." }] }, finishReason: "STOP" }] },
+    ];
+    const response = await POST(request(validBody, { Accept: "application/x-ndjson" }));
+    assert.equal(response.status, 200);
+    assert.match(response.headers.get("content-type"), /application\/x-ndjson/);
+    assert.match(response.headers.get("server-timing"), /firstText;dur=/);
+    const reader = response.body.getReader();
+    try {
+      const first = await reader.read();
+      assert.deepEqual(JSON.parse(new TextDecoder().decode(first.value)), { type: "delta", text: "Alex " });
+    } finally { release(); }
+    let rest = "";
+    while (true) {
+      const { value, done } = await reader.read();
+      if (done) break;
+      rest += new TextDecoder().decode(value);
+    }
+    assert.deepEqual(rest.trim().split("\n").map(JSON.parse), [
+      { type: "delta", text: "utiliza Python." }, { type: "done" },
+    ]);
+  });
+
+  await t.test("cancelar a leitura interrompe a geração no provedor", async () => {
+    reset();
+    let release;
+    streamGate = new Promise((resolve) => { release = resolve; });
+    streamChunks = [
+      { candidates: [{ content: { parts: [{ text: "Alex " }] } }] },
+      { candidates: [{ content: { parts: [{ text: "utiliza Python." }] }, finishReason: "STOP" }] },
+    ];
+    const response = await POST(request(validBody, { Accept: "application/x-ndjson" }));
+    const reader = response.body.getReader();
+    await reader.read();
+    const cancelled = reader.cancel();
+    release();
+    await cancelled;
+    assert.equal(geminiSignal.aborted, true);
+  });
+
+  await t.test("stream traduz falhas iniciais e rejeita geração truncada após texto parcial", async () => {
+    reset();
+    geminiStatus = 429;
+    geminiResult = { error: { code: 429, message: "PRIVATE_SDK_DETAIL", status: "RESOURCE_EXHAUSTED" } };
+    const failure = await POST(request(validBody, { Accept: "application/x-ndjson" }));
+    assert.equal(failure.status, 429);
+    reset();
+    streamChunks = [
+      { candidates: [{ content: { parts: [{ text: "Alex " }] } }] },
+      { candidates: [{ finishReason: "MAX_TOKENS" }] },
+    ];
+    const response = await POST(request(validBody, { Accept: "application/x-ndjson" }));
+    const events = (await response.text()).trim().split("\n").map(JSON.parse);
+    assert.deepEqual(events.at(-1), { type: "error", code: "invalid_response" });
+    assert.ok(!events.some((event) => event.type === "done"));
+  });
+
+  await t.test("leitor preserva UTF-8 fragmentado e exige conclusão explícita", async () => {
+    const encode = new TextEncoder();
+    function fragmented(text) {
+      return new ReadableStream({ start(controller) {
+        for (const byte of encode.encode(text)) controller.enqueue(Uint8Array.of(byte));
+        controller.close();
+      } });
+    }
+    let text = "";
+    await readChatStream(fragmented('{"type":"delta","text":"Experiência em automação"}\n{"type":"done"}\n'), (delta) => { text += delta; });
+    assert.equal(text, "Experiência em automação");
+    await assert.rejects(readChatStream(fragmented('{"type":"delta","text":"partial"}\n'), () => {}), /invalid_response/);
+    await assert.rejects(readChatStream(fragmented('{"type":"error","code":"timeout"}\n'), () => {}), /timeout/);
+    await assert.rejects(readChatStream(fragmented('{"type":"done"}\n'), () => {}), /invalid_response/);
   });
 
   await t.test("deadline local do Gemini é de 45 segundos e resulta em 504", async () => {

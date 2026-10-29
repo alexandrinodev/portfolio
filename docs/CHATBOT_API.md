@@ -114,3 +114,20 @@ Resultado da verificação após esse ajuste: o build de produção e os 11 test
 ### Modelo atual
 
 Configurado `GEMINI_MODEL=gemini-3.5-flash-lite` após a indicação do proprietário. A configuração local foi atualizada preservando as demais variáveis. O nível LOW é compatível com esse modelo e a tabela de preços oficial lista entrada/saída gratuitas no Free Tier. Reiniciar `npm run dev` para carregar a configuração e repetir o teste de `/api/chat`. A validação real desse novo modelo permanece pendente.
+
+
+### Streaming e diagnóstico de latência
+
+O widget envia `Accept: application/x-ndjson`. Nesse modo, a rota transmite uma linha JSON por evento:
+
+```json
+{"type":"delta","text":"Alex tem experiência "}
+{"type":"delta","text":"com APIs."}
+{"type":"done"}
+```
+
+Sem esse cabeçalho, permanece o contrato JSON `{ "reply": "..." }`. Falhas anteriores ao primeiro trecho mantêm os status HTTP existentes. Após iniciar a transmissão, uma falha gera `{"type":"error","code":"timeout"}` (ou outro código público), sem evento `done`. A interface remove a pergunta e a resposta incompleta e restaura o rascunho para nova tentativa. Texto parcial nunca entra no histórico de uma nova pergunta. Fechar o widget cancela a requisição; cancelar a leitura da resposta também cancela a geração no servidor.
+
+O servidor registra `[chatbot] latency` com durações em milissegundos: `redis`, `context`, `firstText` (da chamada Gemini até o primeiro texto), `gemini` (geração e consumo do fluxo), `total` e `outcome`. Não registra perguntas, respostas ou credenciais. O cabeçalho `Server-Timing` das respostas em streaming inclui Redis, contexto e primeiro texto. O tempo `total` termina no servidor; não inclui a renderização no navegador. Compare esses valores ao repetir a mesma pergunta para identificar a etapa mais lenta.
+
+Perguntas factuais recebem orientação explícita de 2 a 4 frases curtas. O limite de tokens e o raciocínio LOW permanecem. O streaming antecipa a exibição, mas não elimina a espera do provedor até o primeiro texto. Testes simulados verificam entrega incremental, falhas durante a geração e decodificação UTF-8 fragmentada; não medem latência real da API.
