@@ -272,5 +272,46 @@
     "subtitle": "Experiências realizadas no SIDIA entre 2023 e 2026, conforme meu currículo.",
     "contribution": "Minha contribuição",
     "result": "Resultado"
+  },
+  "chatbot": {
+    "title": "Alex AI",
+    "subtitle": "Assistente virtual com IA",
+    "open": "Abrir chat com Alex AI",
+    "close": "Fechar chat",
+    "welcome": "Olá! Sou o assistente virtual do portfólio de Alex. Aqui você poderá perguntar sobre sua experiência, tecnologias e tipos de projetos.",
+    "previewNotice": "Suas perguntas e o histórico recente são enviados ao Google. Respostas geradas por IA podem conter erros.",
+    "inputLabel": "Sua pergunta",
+    "placeholder": "O que você gostaria de saber sobre Alex?",
+    "send": "Enviar",
+    "conversation": "Histórico da conversa",
+    "you": "Você",
+    "loading": "Respondendo…",
+    "contact": "Entrar em contato",
+    "errors": {
+      "unavailable": "O assistente está indisponível. Sua pergunta voltou ao campo para tentar novamente.",
+      "rate_limit": "O limite de consultas foi atingido. Aguarde antes de tentar novamente.",
+      "timeout": "A resposta demorou demais. Sua pergunta voltou ao campo para tentar novamente.",
+      "invalid_response": "Não foi possível obter uma resposta. Tente novamente.",
+      "invalid_input": "A pergunta não pôde ser processada. Revise o texto e tente novamente."
+    },
+    "suggestionsTitle": "Comece por um assunto",
+    "suggestions": [
+      {
+        "label": "Experiência",
+        "question": "Qual é a experiência profissional de Alex?"
+      },
+      {
+        "label": "Tecnologias",
+        "question": "Com quais tecnologias Alex já trabalhou?"
+      },
+      {
+        "label": "Projetos",
+        "question": "Que tipos de projetos Alex desenvolveu?"
+      },
+      {
+        "label": "Contato",
+        "question": "Como posso entrar em contato com Alex?"
+      }
+    ]
   }
 }

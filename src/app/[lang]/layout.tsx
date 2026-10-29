@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { JetBrains_Mono } from "next/font/google"
 import "../globals.css";
 import NavBar from "@/components/NavBar";
+import Chatbot from "@/components/Chatbot";
 import { LanguageProvider } from "../i18n/LanguageContext";
 import type { Metadata } from "next"
 
@@ -62,6 +63,7 @@ export default async function RootLayout({
             <main className="min-h-screen">
               {children}
             </main>
+            <Chatbot />
           </LanguageProvider>
         </body>
     </html>

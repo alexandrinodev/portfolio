@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "test:chatbot": "node --conditions=react-server --test --test-isolation=none tests/chatbot-route.test.mjs"
+    "test:chatbot": "node --conditions=react-server --test --test-isolation=none tests/chatbot-route.test.mjs tests/chatbot-conversation.test.mjs"
   },
   "dependencies": {
     "@google/genai": "^2.31.0",

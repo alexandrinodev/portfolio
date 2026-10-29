@@ -330,3 +330,45 @@ Resultado real após o ajuste: Upstash 200, consulta completa ao Gemini 504 e pe
 ## Modelo atualizado — 29/10/2026
 
 Modelo atual: `gemini-3.5-flash-lite`, informado pelo proprietário após o teste no AI Studio. Atualizados `.env.example`, somente `GEMINI_MODEL` no `.env.local` e o modelo usado nos testes simulados. Mantidos raciocínio LOW (compatível segundo documentação oficial), timeout de 45 segundos, saída máxima de 1.024 tokens e ausência de retries. Os diagnósticos anteriores de sucesso pontual e timeouts referem-se ao modelo `gemini-3.8-flash`; a troca não comprova resolução dos timeouts. Reiniciar o servidor de desenvolvimento e validar uma consulta com o novo modelo.
+
+## Etapa didática 4A — Estrutura visual do chat
+
+- [x] Criar `Chatbot.tsx` como componente de cliente com estado `isOpen` e botão flutuante.
+- [x] Incluir dentro do `LanguageProvider` no layout compartilhado e adicionar textos PT/EN às traduções.
+- [x] Criar painel responsivo com identificação de IA, apresentação e campo de texto.
+- [x] Focar o campo ao abrir e devolver foco ao botão ao fechar; Escape funciona dentro do painel. O painel é não modal, permitindo navegar no restante da página.
+- O botão Enviar fica desabilitado e uma mensagem informa que o envio estará disponível em breve. Não há chamada à API, histórico nem estado de envio nesta etapa.
+- Próxima etapa didática: estado do campo e lista de mensagens. A conexão com `/api/chat` será feita separadamente.
+
+## Etapa didática 4B — Campo controlado e mensagens locais
+
+- [x] Criar `draft` para controlar o campo e `messages` para guardar as perguntas exibidas.
+- [x] Usar formulário com `preventDefault`, recusar texto vazio e acrescentar cada mensagem com identificador próprio via atualização funcional.
+- [x] Renderizar mensagens com `map`, preservando quebras de linha e tratando o conteúdo como texto React.
+- [x] Limpar e refocar o campo ao enviar, rolar o painel para a mensagem mais recente e anunciar alterações de forma acessível.
+- Estado mantido ao fechar e reabrir o painel; não há persistência após recarregar a página.
+- O envio é somente local: nenhuma consulta a `/api/chat`, ao Gemini ou ao Upstash. Ainda não há resposta automática. A mensagem de aviso PT/EN reflete essa etapa.
+- Próxima etapa: conectar uma pergunta à rota, adicionando carregamento, resposta e tratamento de falha.
+
+## Etapa didática 4C — Interface conectada à rota
+
+- [x] Adicionar papéis `user`/`assistant` às mensagens e diferenciar a apresentação de cada um.
+- [x] Enviar POST para `/api/chat` com idioma e histórico limitado; somente `role` e `content` saem da interface, sem IDs locais.
+- [x] Selecionar os pares completos mais recentes, respeitando os limites de mensagens e caracteres sem truncar respostas. O histórico completo continua visível no painel.
+- [x] Implementar carregamento e bloqueio imediato contra envios duplicados.
+- [x] Apresentar falhas com textos locais PT/EN e link para a página de contato; restaurar a pergunta no campo e remover a mensagem sem resposta para permitir nova tentativa.
+- [x] Cancelar a espera ao fechar ou desmontar o componente, com timeout local de 55 segundos. Cancelar não garante devolução da cota já consumida no provedor.
+- [x] Informar na interface o envio das perguntas e do histórico recente ao Google.
+- [x] Executar 15 testes simulados de rota e histórico; TypeScript passou. Nenhuma chamada real ao Gemini foi feita nesta etapa.
+- [ ] Conferir manualmente no navegador: sucesso, continuação da conversa, erro, nova tentativa e cancelamento ao fechar, inclusive em português e inglês.
+
+Arquivo auxiliar `conversation.ts` contém apenas tipos e seleção de histórico utilizáveis no navegador; não importa módulos exclusivos de servidor. O build de produção passou com o componente conectado. A interação no navegador permanece para conferência manual.
+
+## Etapa didática 4D — Perguntas sugeridas
+
+- [x] Adicionar quatro assuntos iniciais em PT/EN: experiência, tecnologias, tipos de projetos e contato.
+- [x] Renderizar as opções a partir das traduções com `map`, somente quando não houver mensagens nem erro.
+- [x] Ao clicar, preencher `draft` com a pergunta completa e focar o campo; o visitante pode editar antes de Enviar. O clique não faz chamada à API.
+- [ ] Conferir no navegador as sugestões em PT/EN, a edição do texto e seu desaparecimento após começar a conversa.
+
+Esta etapa não adiciona novos estados. Reutiliza `draft`, `messages` e a referência do campo.
