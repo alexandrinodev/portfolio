@@ -1,5 +1,7 @@
 # Plano de implementação do chatbot do portfólio
 
+> Atualização: a integração foi migrada para Vercel AI SDK (`ai`, `@ai-sdk/google`, `@ai-sdk/react`) com conexão direta ao Gemini. A interface usa `useChat()` e SSE. As referências a `@google/genai` nas etapas abaixo registram a implementação original e foram substituídas; consulte [o contrato atual da API](CHATBOT_API.md#streaming-com-vercel-ai-sdk-e-diagnóstico-de-latência).
+
 ## Objetivo
 
 Adicionar um assistente virtual que responda sobre o perfil profissional de Alex Alexandrino: experiência, habilidades, formação, projetos, serviços e contato. O chatbot deve funcionar em português e inglês no portfólio hospedado na Vercel.
@@ -79,7 +81,7 @@ Os nomes abaixo são propostas; confirmar as convenções do repositório antes 
 | `src/app/api/chat/route.ts` | Endpoint de servidor, validação e resposta |
 | `src/app/lib/chatbot/profile.ts` | Base derivada exclusivamente do Markdown público aprovado, com fonte e data |
 | `src/app/lib/chatbot/instructions.ts` | Regras baseadas em `docs/alex_ai_system_prompt.md`, adaptadas ao envio da base completa |
-| `src/app/lib/chatbot/provider.ts` | Integração de servidor com Google Gemini pelo SDK `@google/genai` |
+| `src/app/lib/chatbot/provider.ts` | Integração de servidor com Google Gemini via Vercel AI SDK |
 | `src/app/[lang]/layout.tsx` | Inclusão do componente nas páginas desejadas |
 | `src/app/i18n/translations/pt.json` | Textos da interface em português |
 | `src/app/i18n/translations/en.json` | Textos da interface em inglês |

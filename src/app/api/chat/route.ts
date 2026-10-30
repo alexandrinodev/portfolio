@@ -1,3 +1,4 @@
+import { createUIMessageStreamResponse, type UIMessageChunk } from "ai";
 import { ChatbotError, generateChatbotReply, streamChatbotReply, type ChatLanguage } from "@/app/lib/chatbot/provider";
 import { checkChatRateLimit } from "@/app/lib/chatbot/rate-limit";
 import { ChatRequestError, readChatRequest } from "@/app/lib/chatbot/request";
@@ -56,30 +57,34 @@ export async function POST(request: Request): Promise<Response> {
       return errorResponse("rate_limit", language, retryAfter);
     }
 
-    if (request.headers.get("accept")?.includes("application/x-ndjson")) {
+    if (request.headers.get("accept")?.includes("text/event-stream")) {
       const controller = new AbortController();
       const signal = AbortSignal.any([request.signal, controller.signal]);
       const iterator = streamChatbotReply({ ...input, signal, onTiming: recordTiming });
       // Antes de enviar cabeçalhos, preservar os status HTTP de falhas iniciais.
       const first = await iterator.next();
-      const encoder = new TextEncoder();
       let pending = first;
       let cancelled = false;
-      const body = new ReadableStream<Uint8Array>({
+      const body = new ReadableStream<UIMessageChunk>({
+        start(output) {
+          output.enqueue({ type: "start" });
+          output.enqueue({ type: "text-start", id: "reply" });
+        },
         async pull(output) {
           try {
             if (pending.done) {
-              output.enqueue(encoder.encode(JSON.stringify({ type: "done" }) + "\n"));
+              output.enqueue({ type: "text-end", id: "reply" });
+              output.enqueue({ type: "finish", finishReason: "stop" });
               output.close();
               logTiming("success");
               return;
             }
-            output.enqueue(encoder.encode(JSON.stringify({ type: "delta", text: pending.value }) + "\n"));
+            output.enqueue({ type: "text-delta", id: "reply", delta: pending.value });
             pending = await iterator.next();
           } catch (error) {
             if (cancelled) return;
             const code = error instanceof ChatbotError ? error.code : "unavailable";
-            output.enqueue(encoder.encode(JSON.stringify({ type: "error", code }) + "\n"));
+            output.enqueue({ type: "error", errorText: code });
             output.close();
             logTiming(code);
           }
@@ -91,8 +96,7 @@ export async function POST(request: Request): Promise<Response> {
           logTiming("aborted");
         },
       });
-      return new Response(body, { headers: {
-        "Content-Type": "application/x-ndjson; charset=utf-8",
+      return createUIMessageStreamResponse({ stream: body, headers: {
         "Cache-Control": "no-store, no-transform",
         "X-Accel-Buffering": "no",
         "Server-Timing": `redis;dur=${timings.redis}, context;dur=${timings.context}, firstText;dur=${timings.firstText}`,

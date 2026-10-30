@@ -116,18 +116,18 @@ Resultado da verificação após esse ajuste: o build de produção e os 11 test
 Configurado `GEMINI_MODEL=gemini-3.5-flash-lite` após a indicação do proprietário. A configuração local foi atualizada preservando as demais variáveis. O nível LOW é compatível com esse modelo e a tabela de preços oficial lista entrada/saída gratuitas no Free Tier. Reiniciar `npm run dev` para carregar a configuração e repetir o teste de `/api/chat`. A validação real desse novo modelo permanece pendente.
 
 
-### Streaming e diagnóstico de latência
+### Streaming com Vercel AI SDK e diagnóstico de latência
 
-O widget envia `Accept: application/x-ndjson`. Nesse modo, a rota transmite uma linha JSON por evento:
+O chatbot usa `ai`, `@ai-sdk/google` e `@ai-sdk/react`. O provider instancia `createGoogle({ apiKey })` com `GEMINI_API_KEY` e usa o modelo de `GEMINI_MODEL` diretamente na Gemini API. Não usa AI Gateway nem requer nova chave ou conta. A dependência `@google/genai` foi removida.
 
-```json
-{"type":"delta","text":"Alex tem experiência "}
-{"type":"delta","text":"com APIs."}
-{"type":"done"}
-```
+O widget usa `useChat()` e `DefaultChatTransport`. O transporte converte as mensagens da interface para o contrato validado `{ language, messages: [{ role, content }] }`, preservando pares completos dentro dos limites atuais. IDs, partes de interface e opções internas do SDK não são aceitos na API.
 
-Sem esse cabeçalho, permanece o contrato JSON `{ "reply": "..." }`. Falhas anteriores ao primeiro trecho mantêm os status HTTP existentes. Após iniciar a transmissão, uma falha gera `{"type":"error","code":"timeout"}` (ou outro código público), sem evento `done`. A interface remove a pergunta e a resposta incompleta e restaura o rascunho para nova tentativa. Texto parcial nunca entra no histórico de uma nova pergunta. Fechar o widget cancela a requisição; cancelar a leitura da resposta também cancela a geração no servidor.
+O widget envia `Accept: text/event-stream`. Nesse modo, `streamText()` gera os trechos e `createUIMessageStreamResponse()` os serializa no protocolo UI Message Stream do SDK (SSE), com eventos `start`, `text-start`, `text-delta`, `text-end` e `finish`. Não são transmitidos pensamentos internos. O antigo protocolo NDJSON e seu leitor foram substituídos.
 
-O servidor registra `[chatbot] latency` com durações em milissegundos: `redis`, `context`, `firstText` (da chamada Gemini até o primeiro texto), `gemini` (geração e consumo do fluxo), `total` e `outcome`. Não registra perguntas, respostas ou credenciais. O cabeçalho `Server-Timing` das respostas em streaming inclui Redis, contexto e primeiro texto. O tempo `total` termina no servidor; não inclui a renderização no navegador. Compare esses valores ao repetir a mesma pergunta para identificar a etapa mais lenta.
+Sem esse cabeçalho, permanece o contrato JSON `{ "reply": "..." }`, usando `generateText()`. Falhas anteriores ao primeiro texto mantêm os status HTTP existentes. Após iniciar a transmissão, uma falha gera evento `error` com `errorText` contendo apenas um código público, sem evento `finish`. O cliente exige conclusão com motivo `stop`; falhas e cancelamentos removem a pergunta e a resposta incompleta e restauram o rascunho. Fechar o widget chama `stop()`. A API propaga o cancelamento ao provedor e mantém o prazo de 45 segundos, sem repetição automática (`maxRetries: 0`).
 
-Perguntas factuais recebem orientação explícita de 2 a 4 frases curtas. O limite de tokens e o raciocínio LOW permanecem. O streaming antecipa a exibição, mas não elimina a espera do provedor até o primeiro texto. Testes simulados verificam entrega incremental, falhas durante a geração e decodificação UTF-8 fragmentada; não medem latência real da API.
+O servidor registra `[chatbot] latency` com durações em milissegundos: `redis`, `context`, `firstText` (da chamada Gemini até o primeiro texto), `gemini` (geração e consumo do fluxo), `total` e `outcome`. Não registra perguntas, respostas ou credenciais. O cabeçalho `Server-Timing` das respostas em streaming inclui Redis, contexto e primeiro texto. O tempo `total` termina no servidor; não inclui a renderização no navegador.
+
+Perguntas factuais recebem orientação explícita de 2 a 4 frases curtas. O limite de 1.024 tokens e o raciocínio LOW permanecem. O streaming antecipa a exibição, mas não elimina a espera do provedor até o primeiro texto. Os testes usam respostas HTTP simuladas e o transporte real do SDK para verificar entrega incremental, erros, cancelamento, contexto e limites, sem consumir cota real.
+
+Referências: [provider Google](https://ai-sdk.dev/providers/ai-sdk-providers/google), [useChat](https://ai-sdk.dev/docs/reference/ai-sdk-ui/use-chat) e [protocolo de streaming](https://ai-sdk.dev/docs/ai-sdk-ui/stream-protocol).

@@ -3,9 +3,8 @@
 import { useEffect, useId, useRef, useState, type FormEvent } from "react";
 import { Bot, LoaderCircle, MessageCircle, Send, X } from "lucide-react";
 import { useLanguage } from "@/app/i18n/LanguageContext";
-import { buildRequestMessages, type ConversationMessage } from "@/app/lib/chatbot/conversation";
-
-import { readChatStream } from "@/app/lib/chatbot/stream";
+import { useChat } from "@ai-sdk/react";
+import { createChatTransport, messageText } from "@/app/lib/chatbot/transport";
 
 type ErrorCode = "unavailable" | "rate_limit" | "timeout" | "invalid_response" | "invalid_input";
 
@@ -13,9 +12,25 @@ export default function Chatbot() {
   const { t, language } = useLanguage();
   const [isOpen, setIsOpen] = useState(false);
   const [draft, setDraft] = useState("");
-  const [messages, setMessages] = useState<ConversationMessage[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<ErrorCode | null>(null);
+  const [transport] = useState(createChatTransport);
+  const activeRequest = useRef<{ succeeded: boolean } | null>(null);
+  const { messages: chatMessages, setMessages, sendMessage, stop, clearError, status } = useChat({
+    transport,
+    onError(failure) {
+      const code = failure.message;
+      setError(["rate_limit", "timeout", "invalid_response", "invalid_input"].includes(code)
+        ? code as ErrorCode : "unavailable");
+    },
+    onFinish({ isAbort, isError, finishReason }) {
+      if (!isAbort && !isError && finishReason !== "stop") setError("invalid_response");
+      if (activeRequest.current) {
+        activeRequest.current.succeeded = !isAbort && !isError && finishReason === "stop";
+      }
+    },
+  });
+  const messages = chatMessages.map((message) => ({ ...message, content: messageText(message) }));
+  const isLoading = status === "submitted" || status === "streaming";
   const id = useId();
   const panelId = `${id}-panel`;
   const titleId = `${id}-title`;
@@ -24,10 +39,7 @@ export default function Chatbot() {
   const triggerRef = useRef<HTMLButtonElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const messageListRef = useRef<HTMLDivElement>(null);
-  const nextMessageId = useRef(0);
-  const activeRequest = useRef<AbortController | null>(null);
-
-  useEffect(() => () => activeRequest.current?.abort(), []);
+  useEffect(() => () => { void stop(); }, [stop]);
 
   useEffect(() => {
     if (isOpen) inputRef.current?.focus();
@@ -39,7 +51,7 @@ export default function Chatbot() {
   }, [messages, isOpen, isLoading, error]);
 
   function closeChat() {
-    activeRequest.current?.abort();
+    void stop();
     setIsOpen(false);
     triggerRef.current?.focus();
   }
@@ -49,69 +61,33 @@ export default function Chatbot() {
     const content = draft.trim();
     // A ref bloqueia outro envio imediatamente, antes da próxima renderização.
     if (!content || activeRequest.current) return;
-    const message: ConversationMessage = { id: nextMessageId.current++, role: "user", content };
-    const replyId = nextMessageId.current++;
-    const controller = new AbortController();
-    activeRequest.current = controller;
+    const previousMessages = chatMessages;
+    const pending = { succeeded: false };
+    activeRequest.current = pending;
     let timedOut = false;
     const timeout = window.setTimeout(() => {
       timedOut = true;
-      controller.abort();
+      void stop();
     }, 55000);
 
-    setMessages((previous) => [...previous, message]);
     setDraft("");
     setError(null);
-    setIsLoading(true);
+    clearError();
     inputRef.current?.focus();
 
     try {
-      const response = await fetch("/api/chat", {
-        method: "POST",
-        headers: { "Content-Type": "application/json", Accept: "application/x-ndjson" },
-        body: JSON.stringify({ language, messages: buildRequestMessages(messages, content) }),
-        signal: controller.signal,
-      });
-      if (!response.ok) {
-        const data: unknown = await response.json();
-        let code: ErrorCode = "unavailable";
-        if (typeof data === "object" && data !== null && "error" in data) {
-          const failure = data.error;
-          if (typeof failure === "object" && failure !== null && "code" in failure) {
-            if (["rate_limit", "timeout", "invalid_response", "invalid_input"].includes(String(failure.code))) {
-              code = failure.code as ErrorCode;
-            }
-          }
-        }
-        throw new Error(code);
-      }
-      if (!response.body || !response.headers.get("content-type")?.includes("application/x-ndjson")) {
-        throw new Error("invalid_response");
-      }
-      await readChatStream(response.body, (text) => {
-        controller.signal.throwIfAborted();
-        setMessages((previous) => {
-          const existing = previous.find((item) => item.id === replyId);
-          return existing
-            ? previous.map((item) => item.id === replyId ? { ...item, content: item.content + text } : item)
-            : [...previous, { id: replyId, role: "assistant", content: text }];
-        });
-      });
-      controller.signal.throwIfAborted();
-    } catch (failure) {
-      // Retirar a pergunta sem resposta e restaurar o rascunho permite tentar novamente.
-      setMessages((previous) => previous.filter((item) => item.id !== message.id && item.id !== replyId));
-      setDraft(content);
-      if (timedOut) setError("timeout");
-      else if (!controller.signal.aborted) {
-        const code = failure instanceof Error ? failure.message : "unavailable";
-        setError(["rate_limit", "timeout", "invalid_response", "invalid_input"].includes(code)
-          ? code as ErrorCode : "unavailable");
-      }
+      await sendMessage({ text: content }, { body: { language } });
+    } catch {
+      setError("unavailable");
     } finally {
       window.clearTimeout(timeout);
+      // Só respostas concluídas podem compor a próxima pergunta.
+      if (!pending.succeeded) {
+        setMessages(previousMessages);
+        setDraft(content);
+      }
+      if (timedOut) setError("timeout");
       activeRequest.current = null;
-      setIsLoading(false);
     }
   }
 

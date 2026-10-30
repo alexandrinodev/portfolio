@@ -21,7 +21,7 @@ registerHooks({
 const { POST } = await import("../src/app/api/chat/route.ts");
 const { checkChatRateLimit } = await import("../src/app/lib/chatbot/rate-limit.ts");
 
-const { readChatStream } = await import("../src/app/lib/chatbot/stream.ts");
+const { createChatTransport } = await import("../src/app/lib/chatbot/transport.ts");
 
 const validBody = { language: "pt", messages: [{ role: "user", content: "Alex utiliza Python?" }] };
 let geminiCalls;
@@ -94,6 +94,11 @@ globalThis.fetch = async (url, init) => {
   return Response.json(geminiResult, { status: geminiStatus });
 };
 
+function sseEvents(text) {
+  return text.split("\n").filter((line) => line.startsWith("data: ") && line !== "data: [DONE]")
+    .map((line) => JSON.parse(line.slice(6)));
+}
+
 test("rota do chatbot com HTTP simulado", async (t) => {
   await t.test("resposta em JSON inclui apenas o texto e usa os documentos públicos", async () => {
     reset();
@@ -108,7 +113,7 @@ test("rota do chatbot com HTTP simulado", async (t) => {
       assert.ok(context.includes((await readFile(new URL(file, projectRoot), "utf8")).trim()));
     }
     assert.equal(sentToGemini.tools, undefined);
-    assert.equal(sentToGemini.generationConfig.thinkingConfig.thinkingLevel, "LOW");
+    assert.equal(sentToGemini.generationConfig.thinkingConfig.thinkingLevel, "low");
     assert.equal(sentToGemini.generationConfig.maxOutputTokens, 1024);
   });
 
@@ -120,14 +125,19 @@ test("rota do chatbot com HTTP simulado", async (t) => {
       { candidates: [{ content: { parts: [{ text: "Alex " }] } }] },
       { candidates: [{ content: { parts: [{ text: "utiliza Python." }] }, finishReason: "STOP" }] },
     ];
-    const response = await POST(request(validBody, { Accept: "application/x-ndjson" }));
+    const response = await POST(request(validBody, { Accept: "text/event-stream" }));
     assert.equal(response.status, 200);
-    assert.match(response.headers.get("content-type"), /application\/x-ndjson/);
+    assert.match(response.headers.get("content-type"), /text\/event-stream/);
     assert.match(response.headers.get("server-timing"), /firstText;dur=/);
     const reader = response.body.getReader();
     try {
-      const first = await reader.read();
-      assert.deepEqual(JSON.parse(new TextDecoder().decode(first.value)), { type: "delta", text: "Alex " });
+      let initial = "";
+      while (!initial.includes('"type":"text-delta"')) {
+        const first = await reader.read();
+        assert.equal(first.done, false);
+        initial += new TextDecoder().decode(first.value);
+      }
+      assert.ok(initial.includes('"delta":"Alex "'));
     } finally { release(); }
     let rest = "";
     while (true) {
@@ -135,9 +145,9 @@ test("rota do chatbot com HTTP simulado", async (t) => {
       if (done) break;
       rest += new TextDecoder().decode(value);
     }
-    assert.deepEqual(rest.trim().split("\n").map(JSON.parse), [
-      { type: "delta", text: "utiliza Python." }, { type: "done" },
-    ]);
+    const events = sseEvents(rest);
+    assert.ok(events.some((event) => event.type === "text-delta" && event.delta === "utiliza Python."));
+    assert.deepEqual(events.at(-1), { type: "finish", finishReason: "stop" });
   });
 
   await t.test("cancelar a leitura interrompe a geração no provedor", async () => {
@@ -148,12 +158,14 @@ test("rota do chatbot com HTTP simulado", async (t) => {
       { candidates: [{ content: { parts: [{ text: "Alex " }] } }] },
       { candidates: [{ content: { parts: [{ text: "utiliza Python." }] }, finishReason: "STOP" }] },
     ];
-    const response = await POST(request(validBody, { Accept: "application/x-ndjson" }));
+    const response = await POST(request(validBody, { Accept: "text/event-stream" }));
     const reader = response.body.getReader();
     await reader.read();
     const cancelled = reader.cancel();
     release();
     await cancelled;
+    // O cancelamento atravessa os TransformStreams de SSE do SDK.
+    await new Promise(setImmediate);
     assert.equal(geminiSignal.aborted, true);
   });
 
@@ -161,33 +173,53 @@ test("rota do chatbot com HTTP simulado", async (t) => {
     reset();
     geminiStatus = 429;
     geminiResult = { error: { code: 429, message: "PRIVATE_SDK_DETAIL", status: "RESOURCE_EXHAUSTED" } };
-    const failure = await POST(request(validBody, { Accept: "application/x-ndjson" }));
+    const failure = await POST(request(validBody, { Accept: "text/event-stream" }));
     assert.equal(failure.status, 429);
     reset();
     streamChunks = [
       { candidates: [{ content: { parts: [{ text: "Alex " }] } }] },
       { candidates: [{ finishReason: "MAX_TOKENS" }] },
     ];
-    const response = await POST(request(validBody, { Accept: "application/x-ndjson" }));
-    const events = (await response.text()).trim().split("\n").map(JSON.parse);
-    assert.deepEqual(events.at(-1), { type: "error", code: "invalid_response" });
-    assert.ok(!events.some((event) => event.type === "done"));
+    const response = await POST(request(validBody, { Accept: "text/event-stream" }));
+    const events = sseEvents(await response.text());
+    assert.deepEqual(events.at(-1), { type: "error", errorText: "invalid_response" });
+    assert.ok(!events.some((event) => event.type === "finish"));
   });
 
-  await t.test("leitor preserva UTF-8 fragmentado e exige conclusão explícita", async () => {
-    const encode = new TextEncoder();
-    function fragmented(text) {
-      return new ReadableStream({ start(controller) {
-        for (const byte of encode.encode(text)) controller.enqueue(Uint8Array.of(byte));
-        controller.close();
-      } });
-    }
-    let text = "";
-    await readChatStream(fragmented('{"type":"delta","text":"Experiência em automação"}\n{"type":"done"}\n'), (delta) => { text += delta; });
-    assert.equal(text, "Experiência em automação");
-    await assert.rejects(readChatStream(fragmented('{"type":"delta","text":"partial"}\n'), () => {}), /invalid_response/);
-    await assert.rejects(readChatStream(fragmented('{"type":"error","code":"timeout"}\n'), () => {}), /timeout/);
-    await assert.rejects(readChatStream(fragmented('{"type":"done"}\n'), () => {}), /invalid_response/);
+  await t.test("transporte do SDK envia histórico limitado e lê o protocolo UI completo", async () => {
+    reset();
+    const originalFetch = globalThis.fetch;
+    let input;
+    globalThis.fetch = async (url, init) => {
+      if (url === "/api/chat") {
+        input = JSON.parse(init.body);
+        return POST(new Request("http://localhost/api/chat", init));
+      }
+      return originalFetch(url, init);
+    };
+    try {
+      const transport = createChatTransport();
+      const messages = Array.from({ length: 21 }, (_, index) => ({
+        id: String(index), role: index % 2 ? "assistant" : "user",
+        parts: [{ type: "text", text: index === 20 ? "Experiência em automação?" : "Mensagem anterior" }],
+      }));
+      const stream = await transport.sendMessages({
+        chatId: "test", messages, trigger: "submit-message", body: { language: "en" },
+      });
+      const events = [];
+      for await (const event of stream) events.push(event);
+      assert.equal(input.language, "en");
+      assert.equal(input.messages.length, 11);
+      assert.deepEqual(Object.keys(input).sort(), ["language", "messages"]);
+      assert.ok(input.messages.every((message) => !("parts" in message) && !("id" in message)));
+      assert.ok(events.some((event) => event.type === "text-delta" && event.delta === "Alex utiliza Python."));
+      assert.equal(events.at(-1).finishReason, "stop");
+      reset();
+      redisResult = { result: 42 };
+      await assert.rejects(transport.sendMessages({
+        chatId: "test", messages: messages.slice(-1), trigger: "submit-message", body: { language: "pt" },
+      }), /rate_limit/);
+    } finally { globalThis.fetch = originalFetch; }
   });
 
   await t.test("deadline local do Gemini é de 45 segundos e resulta em 504", async () => {

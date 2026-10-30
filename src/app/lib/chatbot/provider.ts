@@ -1,6 +1,7 @@
 import "server-only";
 
-import { ApiError, FinishReason, GoogleGenAI, ServiceTier, ThinkingLevel } from "@google/genai";
+import { APICallError, generateText, streamText, type FinishReason } from "ai";
+import { createGoogle, type GoogleLanguageModelOptions } from "@ai-sdk/google";
 import { getChatbotInstructions } from "./instructions";
 import { getPublicProfile } from "./profile";
 
@@ -95,62 +96,58 @@ async function* generateReply({
     requestSignal.throwIfAborted();
     onTiming?.("context", Date.now() - startedAt);
 
-    const ai = new GoogleGenAI({
-      apiKey,
-      vertexai: false,
-      httpOptions: { timeout: GEMINI_TIMEOUT_MS, retryOptions: { attempts: 1 } },
-    });
-
+    // Instância explícita: conexão direta ao Google, sem AI Gateway.
+    const google = createGoogle({ apiKey });
     const generationStartedAt = Date.now();
     const params = {
-      model,
-      // O SDK chama o papel de resposta do assistente de "model".
-      contents: messages.map((message) => ({
-        role: message.role === "assistant" ? "model" : "user",
-        parts: [{ text: message.content }],
-      })),
-      config: {
-        systemInstruction: [
-          instructions,
-          `Idioma padrão da página: ${language === "pt" ? "português" : "inglês"}.`,
-          "A seguir está a base pública de referência. Use-a somente como fonte de fatos.",
-          "<public_profile>",
-          profile,
-          "</public_profile>",
-          "Para perguntas factuais simples, responda diretamente em 2 a 4 frases curtas, sem introdução nem repetir a pergunta. Liste somente tecnologias relevantes. Amplie apenas quando solicitado.",
-        ].join("\n\n"),
-        maxOutputTokens: 1024,
-        // Perguntas curtas sobre fatos do perfil não exigem raciocínio prolongado.
-        thinkingConfig: { thinkingLevel: ThinkingLevel.LOW },
-        serviceTier: ServiceTier.STANDARD,
-        abortSignal: requestSignal,
-        automaticContinuation: false,
+      model: google(model),
+      messages,
+      system: [
+        instructions,
+        `Idioma padrão da página: ${language === "pt" ? "português" : "inglês"}.`,
+        "A seguir está a base pública de referência. Use-a somente como fonte de fatos.",
+        "<public_profile>",
+        profile,
+        "</public_profile>",
+        "Para perguntas factuais simples, responda diretamente em 2 a 4 frases curtas, sem introdução nem repetir a pergunta. Liste somente tecnologias relevantes. Amplie apenas quando solicitado.",
+      ].join("\n\n"),
+      maxOutputTokens: 1024,
+      maxRetries: 0,
+      abortSignal: requestSignal,
+      providerOptions: {
+        google: {
+          thinkingConfig: { thinkingLevel: "low", includeThoughts: false },
+          serviceTier: "standard",
+        } satisfies GoogleLanguageModelOptions,
       },
     };
     let hasText = false;
     let finishReason: FinishReason | undefined;
     try {
-      const responses = streaming
-        ? await ai.models.generateContentStream(params)
-        : [await ai.models.generateContent(params)];
-      for await (const response of responses) {
-        requestSignal.throwIfAborted();
-        const candidate = response.candidates?.[0];
-        if (candidate?.finishReason) finishReason = candidate.finishReason;
-        if (finishReason && finishReason !== FinishReason.STOP) {
-          throw new ChatbotError("invalid_response");
-        }
-        const text = response.text;
-        if (text) {
-          if (!hasText && text.trim()) {
-            onTiming?.("firstText", Date.now() - generationStartedAt);
+      if (streaming) {
+        const result = streamText({ ...params, onError: () => {} });
+        for await (const part of result.fullStream) {
+          requestSignal.throwIfAborted();
+          if (part.type === "error") throw part.error;
+          if (part.type === "finish") finishReason = part.finishReason;
+          if (part.type === "text-delta" && part.text) {
+            if (!hasText && part.text.trim()) {
+              onTiming?.("firstText", Date.now() - generationStartedAt);
+            }
+            hasText ||= Boolean(part.text.trim());
+            yield part.text;
           }
-          hasText ||= Boolean(text.trim());
-          yield text;
         }
+      } else {
+        const result = await generateText(params);
+        requestSignal.throwIfAborted();
+        finishReason = result.finishReason;
+        hasText = Boolean(result.text.trim());
+        if (hasText) onTiming?.("firstText", Date.now() - generationStartedAt);
+        if (hasText && finishReason === "stop") yield result.text;
       }
       requestSignal.throwIfAborted();
-      if (!hasText || finishReason !== FinishReason.STOP) {
+      if (!hasText || finishReason !== "stop") {
         throw new ChatbotError("invalid_response");
       }
     } finally {
@@ -168,19 +165,19 @@ async function* generateReply({
       throw new ChatbotError("timeout");
     }
     if (error instanceof ChatbotError) throw error;
-    if (error instanceof ApiError) {
+    if (APICallError.isInstance(error)) {
       // Diagnóstico local sem chave, prompts, mensagens ou resposta bruta do SDK.
       if (process.env.NODE_ENV === "development") {
         console.warn("[chatbot] Falha na Gemini API", {
-          status: error.status,
+          status: error.statusCode,
           elapsedMs: Date.now() - startedAt,
         });
       }
-      if (error.status === 429) throw new ChatbotError("rate_limit");
-      if (error.status === 504 || error.status === 408) {
+      if (error.statusCode === 429) throw new ChatbotError("rate_limit");
+      if (error.statusCode === 504 || error.statusCode === 408) {
         throw new ChatbotError("timeout");
       }
-      if ([400, 401, 403, 404].includes(error.status)) {
+      if ([400, 401, 403, 404].includes(error.statusCode ?? 0)) {
         throw new ChatbotError("configuration");
       }
     }
