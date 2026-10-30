@@ -272,5 +272,52 @@
     "subtitle": "Work delivered at SIDIA between 2023 and 2026, as described in my resume.",
     "contribution": "My contribution",
     "result": "Outcome"
+  },
+  "chatbot": {
+    "title": "Alex AI",
+    "subtitle": "AI virtual assistant",
+    "open": "Open chat with Alex AI",
+    "close": "Close chat",
+    "welcome": "Hi! I’m the virtual assistant for Alex’s portfolio. Here you’ll be able to ask about his experience, technologies and types of projects.",
+    "previewNotice": "Your questions and recent conversation history are sent to Google. AI-generated responses may contain errors.",
+    "inputLabel": "Your question",
+    "placeholder": "What would you like to know about Alex?",
+    "send": "Send",
+    "conversation": "Conversation history",
+    "you": "You",
+    "loading": "Replying…",
+    "contact": "Get in touch",
+    "errors": {
+      "unavailable": "The assistant is unavailable. Your question has been restored so you can retry.",
+      "rate_limit": "The request limit has been reached. Please wait before trying again.",
+      "timeout": "The response took too long. Your question has been restored so you can retry.",
+      "invalid_response": "A response could not be obtained. Please try again.",
+      "invalid_input": "The question could not be processed. Please review the text and try again."
+    },
+    "suggestionsTitle": "Start with a topic",
+    "suggestions": [
+      {
+        "label": "Experience",
+        "question": "What is Alex’s professional experience?"
+      },
+      {
+        "label": "Technologies",
+        "question": "Which technologies has Alex worked with?"
+      },
+      {
+        "label": "Projects",
+        "question": "What types of projects has Alex developed?"
+      },
+      {
+        "label": "Contact",
+        "question": "How can I contact Alex?"
+      }
+    ],
+    "invitation": {
+      "title": "Curious about Alex?",
+      "description": "Ask about his experience, technologies and projects. Let Alex AI help you explore the portfolio.",
+      "action": "Ask Alex AI",
+      "dismiss": "Dismiss the Alex AI invitation"
+    }
   }
 }
