@@ -1,4 +1,5 @@
 import { DefaultChatTransport, type UIMessage } from "ai";
+import { toDisplayErrorCode } from "./contracts";
 import { buildRequestMessages } from "./conversation";
 
 export function messageText(message: UIMessage): string {
@@ -28,9 +29,7 @@ export function createChatTransport() {
         let code = "unavailable";
         try {
           const data = await response.json();
-          if (["rate_limit", "timeout", "invalid_response", "invalid_input"].includes(data?.error?.code)) {
-            code = data.error.code;
-          }
+          code = toDisplayErrorCode(data?.error?.code);
         } catch { /* Resposta de proxy sem JSON também vira erro público. */ }
         throw new Error(code);
       }

@@ -116,18 +116,74 @@ Resultado da verificação após esse ajuste: o build de produção e os 11 test
 Configurado `GEMINI_MODEL=gemini-3.5-flash-lite` após a indicação do proprietário. A configuração local foi atualizada preservando as demais variáveis. O nível LOW é compatível com esse modelo e a tabela de preços oficial lista entrada/saída gratuitas no Free Tier. Reiniciar `npm run dev` para carregar a configuração e repetir o teste de `/api/chat`. A validação real desse novo modelo permanece pendente.
 
 
-### Streaming com Vercel AI SDK e diagnóstico de latência
+### RAG com LangChain, Gemini e índice em memória
 
-O chatbot usa `ai`, `@ai-sdk/google` e `@ai-sdk/react`. O provider instancia `createGoogle({ apiKey })` com `GEMINI_API_KEY` e usa o modelo de `GEMINI_MODEL` diretamente na Gemini API. Não usa AI Gateway nem requer nova chave ou conta. A dependência `@google/genai` foi removida.
+O fluxo atual substitui o envio integral da base por recuperação semântica. `knowledge-index.ts` lê o Markdown público de caminho fixo, usa documentos e `RecursiveCharacterTextSplitter` do LangChain (Markdown, 1.100 caracteres e sobreposição de 150) e monta um `MemoryVectorStore`. A implementação `GeminiEmbeddings`, em `embeddings.ts`, adapta a interface `Embeddings` do LangChain ao SDK Google atual, com `RETRIEVAL_DOCUMENT` e `RETRIEVAL_QUERY`, sem retries. Não utiliza FAISS, AI Gateway, LangSmith ou um serviço de banco vetorial.
 
-O widget usa `useChat()` e `DefaultChatTransport`. O transporte converte as mensagens da interface para o contrato validado `{ language, messages: [{ role, content }] }`, preservando pares completos dentro dos limites atuais. IDs, partes de interface e opções internas do SDK não são aceitos na API.
+Configurações adicionais (mesma chave `GEMINI_API_KEY`):
 
-O widget envia `Accept: text/event-stream`. Nesse modo, `streamText()` gera os trechos e `createUIMessageStreamResponse()` os serializa no protocolo UI Message Stream do SDK (SSE), com eventos `start`, `text-start`, `text-delta`, `text-end` e `finish`. Não são transmitidos pensamentos internos. O antigo protocolo NDJSON e seu leitor foram substituídos.
+```dotenv
+GEMINI_EMBEDDING_MODEL=gemini-embedding-001
+CHATBOT_RAG_MIN_SCORE=0.35
+```
 
-Sem esse cabeçalho, permanece o contrato JSON `{ "reply": "..." }`, usando `generateText()`. Falhas anteriores ao primeiro texto mantêm os status HTTP existentes. Após iniciar a transmissão, uma falha gera evento `error` com `errorText` contendo apenas um código público, sem evento `finish`. O cliente exige conclusão com motivo `stop`; falhas e cancelamentos removem a pergunta e a resposta incompleta e restauram o rascunho. Fechar o widget chama `stop()`. A API propaga o cancelamento ao provedor e mantém o prazo de 45 segundos, sem repetição automática (`maxRetries: 0`).
+O modelo de geração continua em `GEMINI_MODEL`. As duas configurações adicionais têm os padrões acima se ausentes. O limiar é uma configuração inicial, não uma garantia de relevância; calibrá-lo com perguntas PT/EN e consultar as cotas do modelo de embeddings da conta.
 
-O servidor registra `[chatbot] latency` com durações em milissegundos: `redis`, `context`, `firstText` (da chamada Gemini até o primeiro texto), `gemini` (geração e consumo do fluxo), `total` e `outcome`. Não registra perguntas, respostas ou credenciais. O cabeçalho `Server-Timing` das respostas em streaming inclui Redis, contexto e primeiro texto. O tempo `total` termina no servidor; não inclui a renderização no navegador.
+A chave do cache usa hash do Markdown, modelo, credencial e parâmetros do splitter. A memória mantém a versão atual e compartilha a Promise de construção entre consultas simultâneas. Falhas descartam a Promise. A indexação compartilhada tem prazo próprio de 30 segundos; cancelar uma consulta não cancela uma indexação que pode atender outras. A consulta pode parar de esperar imediatamente. O prazo geral do provider de 45 segundos inclui recuperação e geração. O cache é temporário e isolado por instância Vercel: cold starts e deployments podem causar nova indexação. Não há escrita no filesystem nem cache vetorial no Redis.
 
-Perguntas factuais recebem orientação explícita de 2 a 4 frases curtas. O limite de 1.024 tokens e o raciocínio LOW permanecem. O streaming antecipa a exibição, mas não elimina a espera do provedor até o primeiro texto. Os testes usam respostas HTTP simuladas e o transporte real do SDK para verificar entrega incremental, erros, cancelamento, contexto e limites, sem consumir cota real.
+A busca recupera oito candidatos, inspeciona origem, integridade, scores, duplicatas e tamanho, e seleciona até quatro blocos dentro de 4.400 caracteres. A consulta considera a pergunta atual e, em continuações detectadas por uma regra simples, a pergunta anterior do visitante. Essa regra não resolve toda referência ambígua. Sem resultados acima do limiar, retorna uma mensagem de informação indisponível, sem chamada de geração nem fallback à base completa.
 
-Referências: [provider Google](https://ai-sdk.dev/providers/ai-sdk-providers/google), [useChat](https://ai-sdk.dev/docs/reference/ai-sdk-ui/use-chat) e [protocolo de streaming](https://ai-sdk.dev/docs/ai-sdk-ui/stream-protocol).
+As instruções ficam somente em `system`. Uma única mensagem JSON `portfolio_question` contém `reference.passages`, `history` e `question`. Papéis de assistente recebidos do navegador permanecem atributos de dados no histórico, sem se tornarem mensagens reais de assistente. O prompt orienta tratar esses textos como dados e responder apenas com fatos dos trechos. Isso reduz mistura de instruções e conteúdo; não constitui uma garantia contra toda tentativa de manipulação.
+
+### Validação completa e transporte da interface
+
+O widget mantém `useChat()`, `DefaultChatTransport` e `Accept: text/event-stream`. A rota usa `createUIMessageStreamResponse()` para gerar SSE compatível com o SDK. O provider consome `streamText()` internamente, mas acumula o texto e valida **antes de liberá-lo**: motivo de conclusão `stop`, texto não vazio, até 6.000 caracteres, sem HTML nem caracteres de controle inválidos. Não há exibição de tokens ainda não validados. O texto é renderizado diretamente pelo React; HTML e Markdown não são interpretados.
+
+A validação é estrutural, sem segundo modelo de revisão factual. Fundamentação e qualidade devem ser avaliadas com perguntas de teste. Respostas truncadas, bloqueadas, vazias ou inválidas geram erro antes de iniciar o texto. Cancelamentos são propagados; a pergunta é restaurada no widget. Sem `Accept: text/event-stream`, o contrato JSON `{ "reply": "..." }` permanece. Ambos usam o mesmo fluxo de `streamText()`, coleta e validação; o cabeçalho muda somente o formato da resposta HTTP.
+
+### Inspecionar trechos e acompanhar consumo
+
+Com Node.js 24 e `.env.local` configurado:
+
+```bash
+npm run inspect:rag -- "Qual a experiência com Python?"
+```
+
+O comando usa o mesmo módulo de recuperação e imprime os trechos públicos e seus scores. Consome chamadas reais de embeddings, não chama o gerador e não passa pelo limite HTTP do Redis. Cada execução tem sua própria memória. Não é um teste automático de qualidade nem deve ser usado em um endpoint público sem controle de uso.
+
+Logs normais não imprimem perguntas, trechos, respostas ou credenciais:
+
+- `[chatbot] retrieval`: cache hit, quantidade indexada, IDs e scores selecionados e caracteres de contexto.
+- `[chatbot] tokens`: tokens de entrada, saída, total, raciocínio e cache de geração quando retornados pela API (`null` quando ausentes). Não inclui embeddings.
+- `[chatbot] latency`: `redis`, `index`, `queryEmbedding`, `search`, `context`, `firstText`, `responseValidation`, `gemini`, `total` e `outcome`, conforme as etapas executadas. `context` inclui a preparação e a recuperação; não somar todas as durações como etapas independentes. `firstText` mede o primeiro texto do provedor, não o momento de exibição após validação. `Server-Timing` inclui as medições disponíveis na resposta SSE.
+
+O cache reduz reindexações na mesma instância, e o RAG limita o texto dos fatos enviados à geração. A economia líquida deve considerar embeddings, instruções e histórico. Testes HTTP simulados verificam o fluxo e não validam a relevância dos embeddings reais nem estimam custos ou latência em produção.
+
+Referências: [MemoryVectorStore](https://docs.langchain.com/oss/javascript/integrations/vectorstores/memory), [provider Google](https://ai-sdk.dev/providers/ai-sdk-providers/google), [useChat](https://ai-sdk.dev/docs/reference/ai-sdk-ui/use-chat).
+
+
+### Manutenção e testes
+
+`provider.ts` coordena o caso de uso; `prompt.ts` constrói a consulta e as mensagens, `generation.ts` integra a geração, `errors.ts` normaliza falhas e `contracts.ts` centraliza tipos, limites e validações. `config.ts` valida a configuração, incluindo o limiar de similaridade: valores vazios usam o padrão, valores inválidos resultam em `configuration`. Vetores inválidos resultam em `invalid_response`.
+
+`KnowledgeIndexCache` recebe a leitura do Markdown e a fábrica de embeddings pelo construtor. Isso permite verificar invalidação por conteúdo, modelo e credencial, cancelamento individual sem interromper trabalho compartilhado, reconstrução após falha e preservação de uma versão nova quando uma construção antiga falha.
+
+A API gera SSE somente depois que `generateChatbotReply()` retorna uma resposta validada. A geração em `generation.ts` usa um único caminho de `streamText()`, independente do formato HTTP, e valida a resposta completa antes da exibição. Erros HTTP e falhas de geração possuem códigos tipados; a rota não classifica erros pelo texto de `Error.message`.
+
+Execute `npm run test:chatbot`. O script carrega `scripts/register-typescript.mjs` para resolver os imports TypeScript e inclui testes de domínio, cache, conversa, transporte e HTTP, todos sem serviços reais.
+
+
+### Idioma de resposta
+
+`language` é o idioma atual da página, enviado pelo `LanguageContext` da interface. A instrução de sistema exige português para `pt` e inglês para `en`, independentemente do idioma da pergunta, dos trechos e do histórico, inclusive quando o visitante pede outra língua. As informações recuperadas devem ser traduzidas, preservando nomes próprios e de tecnologias. A resposta fixa de ausência de trechos e os erros após validação também usam esse idioma. `Accept-Language` só é utilizado como fallback de erros antes da validação do corpo.
+
+Os testes simulados verificam o idioma enviado ao provedor nas duas direções, com histórico misto e pedidos de mudança, e o transporte com troca de idioma e ausência de trechos. Não fazem detecção automática de idioma da resposta real do Gemini.
+
+
+### Guardrails
+
+Depois da validação HTTP e do limite Redis, `inspectConversation()` verifica sinais explícitos de injeção. Uma pergunta bloqueada retorna resposta conversacional fixa em PT/EN (HTTP 200, nos mesmos formatos JSON/SSE), sem embeddings ou geração. Pares suspeitos do histórico são removidos. O restante é serializado como dados no envelope, nunca como autoridade de sistema ou assistente. A inspeção de trechos também descarta conteúdo com esses sinais, mesmo quando a origem e a similaridade são válidas.
+
+Depois da validação estrutural, `validateGuardedReply()` verifica valores protegidos conhecidos, cópia de frases internas longas, dumps de referência e URLs sem correspondência nos trechos aprovados. Uma saída bloqueada retorna HTTP 502 com código `invalid_response` antes de iniciar texto de resposta. Logs `[chatbot] guardrail` incluem somente etapa e decisão, sem o conteúdo detectado. Nenhuma ferramenta ou navegação foi habilitada.
+
+Essas verificações são heurísticas, não um classificador infalível nem uma validação factual. Há testes de regressão de ataques e de perguntas legítimas; não houve avaliação adversarial com chamadas reais ao Gemini. Consulte [CHATBOT_SECURITY.md](CHATBOT_SECURITY.md).

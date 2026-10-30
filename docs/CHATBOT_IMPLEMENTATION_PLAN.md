@@ -1,6 +1,8 @@
 # Plano de implementação do chatbot do portfólio
 
-> Atualização: a integração foi migrada para Vercel AI SDK (`ai`, `@ai-sdk/google`, `@ai-sdk/react`) com conexão direta ao Gemini. A interface usa `useChat()` e SSE. As referências a `@google/genai` nas etapas abaixo registram a implementação original e foram substituídas; consulte [o contrato atual da API](CHATBOT_API.md#streaming-com-vercel-ai-sdk-e-diagnóstico-de-latência).
+> Fluxo atual: RAG com LangChain, embeddings Gemini e índice em memória; inspeção dos trechos, instruções separadas dos dados e validação da resposta antes da exibição. O cache é temporário por instância. Consulte o [README](../README.md#-como-o-chatbot-responde) e a [API](CHATBOT_API.md#rag-com-langchain-gemini-e-índice-em-memória). As etapas seguintes registram a evolução histórica.
+
+> Atualização anterior: a integração foi migrada para Vercel AI SDK (`ai`, `@ai-sdk/google`, `@ai-sdk/react`) com conexão direta ao Gemini. A interface usa `useChat()` e SSE. As referências a `@google/genai` nas etapas abaixo registram a implementação original e foram substituídas; consulte [o contrato atual da API](CHATBOT_API.md#rag-com-langchain-gemini-e-índice-em-memória).
 
 ## Objetivo
 

@@ -1,5 +1,6 @@
 import { createUIMessageStreamResponse, type UIMessageChunk } from "ai";
-import { ChatbotError, generateChatbotReply, streamChatbotReply, type ChatLanguage } from "@/app/lib/chatbot/provider";
+import { generateChatbotReply } from "@/app/lib/chatbot/provider";
+import { ChatbotError, type ChatLanguage, type RecordTiming } from "@/app/lib/chatbot/contracts";
 import { checkChatRateLimit } from "@/app/lib/chatbot/rate-limit";
 import { ChatRequestError, readChatRequest } from "@/app/lib/chatbot/request";
 
@@ -33,12 +34,31 @@ function errorResponse(code: keyof typeof errors, language: ChatLanguage, retryA
   );
 }
 
+// O texto já está completo e validado; SSE é apenas o protocolo do useChat.
+function validatedReplyResponse(reply: string, timings: Record<string, number>): Response {
+  const stream = new ReadableStream<UIMessageChunk>({
+    start(output) {
+      output.enqueue({ type: "start" });
+      output.enqueue({ type: "text-start", id: "reply" });
+      output.enqueue({ type: "text-delta", id: "reply", delta: reply });
+      output.enqueue({ type: "text-end", id: "reply" });
+      output.enqueue({ type: "finish", finishReason: "stop" });
+      output.close();
+    },
+  });
+  return createUIMessageStreamResponse({ stream, headers: {
+    "Cache-Control": "no-store, no-transform",
+    "X-Accel-Buffering": "no",
+    "Server-Timing": Object.entries(timings).map(([stage, duration]) => `${stage};dur=${duration}`).join(", "),
+  } });
+}
+
 export async function POST(request: Request): Promise<Response> {
   let language: ChatLanguage = request.headers.get("accept-language")?.startsWith("en") ? "en" : "pt";
 
   const startedAt = Date.now();
   const timings: Record<string, number> = {};
-  const recordTiming = (stage: string, milliseconds: number) => { timings[stage] = milliseconds; };
+  const recordTiming: RecordTiming = (stage, milliseconds) => { timings[stage] = milliseconds; };
   const logTiming = (outcome: string) => {
     console.info("[chatbot] latency", { ...timings, total: Date.now() - startedAt, outcome });
   };
@@ -57,63 +77,21 @@ export async function POST(request: Request): Promise<Response> {
       return errorResponse("rate_limit", language, retryAfter);
     }
 
-    if (request.headers.get("accept")?.includes("text/event-stream")) {
-      const controller = new AbortController();
-      const signal = AbortSignal.any([request.signal, controller.signal]);
-      const iterator = streamChatbotReply({ ...input, signal, onTiming: recordTiming });
-      // Antes de enviar cabeçalhos, preservar os status HTTP de falhas iniciais.
-      const first = await iterator.next();
-      let pending = first;
-      let cancelled = false;
-      const body = new ReadableStream<UIMessageChunk>({
-        start(output) {
-          output.enqueue({ type: "start" });
-          output.enqueue({ type: "text-start", id: "reply" });
-        },
-        async pull(output) {
-          try {
-            if (pending.done) {
-              output.enqueue({ type: "text-end", id: "reply" });
-              output.enqueue({ type: "finish", finishReason: "stop" });
-              output.close();
-              logTiming("success");
-              return;
-            }
-            output.enqueue({ type: "text-delta", id: "reply", delta: pending.value });
-            pending = await iterator.next();
-          } catch (error) {
-            if (cancelled) return;
-            const code = error instanceof ChatbotError ? error.code : "unavailable";
-            output.enqueue({ type: "error", errorText: code });
-            output.close();
-            logTiming(code);
-          }
-        },
-        async cancel() {
-          cancelled = true;
-          controller.abort();
-          await iterator.return(undefined);
-          logTiming("aborted");
-        },
-      });
-      return createUIMessageStreamResponse({ stream: body, headers: {
-        "Cache-Control": "no-store, no-transform",
-        "X-Accel-Buffering": "no",
-        "Server-Timing": `redis;dur=${timings.redis}, context;dur=${timings.context}, firstText;dur=${timings.firstText}`,
-      } });
-    }
-    const reply = await generateChatbotReply({ ...input, signal: request.signal, onTiming: recordTiming });
+    const acceptsStream = request.headers.get("accept")?.includes("text/event-stream") ?? false;
+    const reply = await generateChatbotReply({
+      ...input,
+      signal: request.signal,
+      onTiming: recordTiming,
+    });
     logTiming("success");
-    return Response.json({ reply }, { headers: { "Cache-Control": "no-store" } });
+    return acceptsStream
+      ? validatedReplyResponse(reply, timings)
+      : Response.json({ reply }, { headers: { "Cache-Control": "no-store" } });
   } catch (error) {
-    logTiming(error instanceof ChatbotError ? error.code : "unavailable");
-    if (request.signal.aborted) return errorResponse("aborted", language);
-    if (error instanceof ChatbotError) {
-      return errorResponse(error.code, language);
-    }
-    if (error instanceof ChatRequestError && error.message in errors) {
-      return errorResponse(error.message as keyof typeof errors, language);
-    }
-    return errorResponse("unavailable", language);
+    const code = request.signal.aborted ? "aborted"
+      : error instanceof ChatbotError || error instanceof ChatRequestError ? error.code
+      : "unavailable";
+    logTiming(code);
+    return errorResponse(code, language);
   }
 }

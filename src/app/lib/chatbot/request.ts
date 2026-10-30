@@ -5,16 +5,22 @@ import {
   validateChatInput,
   type ChatLanguage,
   type ChatMessage,
-} from "./provider";
+  chatLimits,
+} from "./contracts";
+
+type ChatRequestErrorCode = "invalid_input" | "body_too_large" | "unsupported_media_type";
 
 export class ChatRequestError extends Error {
-  constructor(publicCode: "invalid_input" | "body_too_large" | "unsupported_media_type") {
-    super(publicCode);
+  readonly code: ChatRequestErrorCode;
+
+  constructor(code: ChatRequestErrorCode) {
+    super(code);
+    this.code = code;
     this.name = "ChatRequestError";
   }
 }
 
-const MAX_BODY_BYTES = 64 * 1024;
+const MAX_BODY_BYTES = chatLimits.maxBodyBytes;
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
@@ -84,11 +90,6 @@ export async function readChatRequest(request: Request): Promise<{
 
   const messages = body.messages as ChatMessage[];
   validateChatInput(messages, body.language);
-
-  // Uma conversa começa pelo visitante e alterna pergunta/resposta.
-  if (messages.some((message, index) => message.role !== (index % 2 === 0 ? "user" : "assistant"))) {
-    throw new ChatbotError("invalid_input");
-  }
 
   return { messages, language: body.language };
 }

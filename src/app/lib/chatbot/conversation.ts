@@ -1,3 +1,5 @@
+import { chatLimits } from "./contracts";
+
 // Este módulo contém apenas dados da interface; pode ser usado no navegador.
 export type ConversationMessage = {
   id: number;
@@ -16,9 +18,9 @@ export function buildRequestMessages(history: ConversationMessage[], question: s
     const pair = history.slice(index, index + 2);
     const pairCharacters = pair.reduce((total, message) => total + message.content.length, 0);
     if (
-      selected.length + 2 > 12 ||
-      totalCharacters + pairCharacters > 12000 ||
-      pair.some((message) => message.content.length > 2000)
+      selected.length + 2 > chatLimits.maxMessages ||
+      totalCharacters + pairCharacters > chatLimits.maxConversationCharacters ||
+      pair.some((message) => message.content.length > chatLimits.maxMessageCharacters)
     ) break;
 
     selected.unshift(...pair.map(({ role, content }) => ({ role, content })));

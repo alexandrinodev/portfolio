@@ -1,6 +1,6 @@
 import "server-only";
 
-import { ChatbotError } from "./provider";
+import { ChatbotError } from "./contracts";
 
 type Window = { key: string; limit: number; ttl: number };
 const localCounters = new Map<string, { count: number; expiresAt: number }>();
