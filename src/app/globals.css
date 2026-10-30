@@ -28,3 +28,71 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+.chatbot-launcher {
+  animation: chatbot-enter 450ms ease-out both;
+}
+
+.chatbot-invitation {
+  transform-origin: bottom right;
+  animation: chatbot-enter 350ms ease-out both;
+}
+
+.chatbot-invitation[data-state="leaving"] {
+  opacity: 0;
+  pointer-events: none;
+  animation: chatbot-leave 250ms ease-in both;
+}
+
+.chatbot-launcher-ring {
+  animation: chatbot-ring 2s ease-out 2 forwards;
+}
+
+.chatbot-launcher-icon {
+  animation: chatbot-wave 900ms ease-in-out 2;
+}
+
+.chatbot-typing-cursor {
+  animation: chatbot-caret 700ms steps(1, end) 5;
+}
+
+@keyframes chatbot-caret {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+@keyframes chatbot-enter {
+  from { opacity: 0; transform: translateY(10px) scale(0.96); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes chatbot-leave {
+  from { opacity: 1; transform: translateY(0) scale(1); }
+  to { opacity: 0; transform: translateY(8px) scale(0.97); }
+}
+
+@keyframes chatbot-ring {
+  from { opacity: 0.7; transform: scale(1); }
+  to { opacity: 0; transform: scale(1.2, 1.45); }
+}
+
+@keyframes chatbot-wave {
+  0%, 100% { transform: rotate(0); }
+  25% { transform: rotate(-12deg); }
+  65% { transform: rotate(10deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .chatbot-launcher,
+  .chatbot-invitation,
+  .chatbot-invitation[data-state="leaving"],
+  .chatbot-launcher-ring,
+  .chatbot-launcher-icon,
+  .chatbot-typing-cursor {
+    animation: none;
+  }
+
+  .chatbot-launcher-ring {
+    display: none;
+  }
+}

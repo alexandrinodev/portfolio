@@ -312,6 +312,12 @@
         "label": "Contato",
         "question": "Como posso entrar em contato com Alex?"
       }
-    ]
+    ],
+    "invitation": {
+      "title": "Quer conhecer melhor o Alex?",
+      "description": "Pergunte sobre experiência, tecnologias e projetos. O Alex AI te ajuda a explorar o portfólio.",
+      "action": "Pergunte ao Alex AI",
+      "dismiss": "Dispensar convite do Alex AI"
+    }
   }
 }

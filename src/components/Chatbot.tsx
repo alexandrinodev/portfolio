@@ -1,16 +1,23 @@
 "use client";
 
-import { useEffect, useId, useMemo, useRef, useState, type FormEvent } from "react";
+import { useCallback, useEffect, useId, useMemo, useRef, useState, type FormEvent } from "react";
 import { Bot, LoaderCircle, MessageCircle, Send, X } from "lucide-react";
+import TypewriterText from "./TypewriterText";
 import { useLanguage } from "@/app/i18n/LanguageContext";
 import { useChat } from "@ai-sdk/react";
 import { createChatTransport, messageText } from "@/app/lib/chatbot/transport";
 
 import { chatLimits, toDisplayErrorCode, type ChatDisplayErrorCode } from "@/app/lib/chatbot/contracts";
 
+const INVITATION_DELAY_MS = 2500;
+const INVITATION_VISIBLE_MS = 6000;
+const INVITATION_EXIT_MS = 250;
+
 export default function Chatbot() {
   const { t, language } = useLanguage();
   const [isOpen, setIsOpen] = useState(false);
+  const [invitationState, setInvitationState] = useState<"waiting" | "typing" | "visible" | "leaving" | "dismissed">("waiting");
+  const [isInvitationPaused, setInvitationPaused] = useState(false);
   const [draft, setDraft] = useState("");
   const [error, setError] = useState<ChatDisplayErrorCode | null>(null);
   const [transport] = useState(createChatTransport);
@@ -36,9 +43,37 @@ export default function Chatbot() {
   const panelId = `${id}-panel`;
   const titleId = `${id}-title`;
   const inputId = `${id}-input`;
+  const invitationTitleId = `${id}-invitation-title`;
+  const invitationTextId = `${id}-invitation-text`;
+  const showInvitation = !isOpen && (invitationState === "typing" || invitationState === "visible" || invitationState === "leaving");
   const triggerRef = useRef<HTMLButtonElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const messageListRef = useRef<HTMLDivElement>(null);
+
+  const startInvitationTyping = useCallback(() => {
+    setInvitationState((current) => current === "visible" ? "typing" : current);
+  }, []);
+  const completeInvitationTyping = useCallback(() => {
+    setInvitationState((current) => current === "typing" ? "visible" : current);
+  }, []);
+
+  useEffect(() => {
+    const timeout = window.setTimeout(() => {
+      setInvitationState((current) => current === "waiting" ? "typing" : current);
+    }, INVITATION_DELAY_MS);
+    return () => window.clearTimeout(timeout);
+  }, []);
+
+  useEffect(() => {
+    if (invitationState === "visible" && !isInvitationPaused) {
+      const timeout = window.setTimeout(() => setInvitationState("leaving"), INVITATION_VISIBLE_MS);
+      return () => window.clearTimeout(timeout);
+    }
+    if (invitationState === "leaving") {
+      const timeout = window.setTimeout(() => setInvitationState("dismissed"), INVITATION_EXIT_MS);
+      return () => window.clearTimeout(timeout);
+    }
+  }, [invitationState, isInvitationPaused]);
 
   useEffect(() => {
     if (isOpen) inputRef.current?.focus();
@@ -48,6 +83,16 @@ export default function Chatbot() {
     const list = messageListRef.current;
     if (isOpen && list) list.scrollTop = list.scrollHeight;
   }, [messages, isOpen, isLoading, error]);
+
+  function dismissInvitation() {
+    setInvitationState("leaving");
+    triggerRef.current?.focus();
+  }
+
+  function openChat() {
+    setInvitationState("dismissed");
+    setIsOpen(true);
+  }
 
   function closeChat() {
     void stop();
@@ -92,6 +137,55 @@ export default function Chatbot() {
 
   return (
     <div className="fixed bottom-6 right-6 z-40 text-white sm:bottom-6 sm:right-6">
+      {showInvitation && (
+        <aside
+          aria-labelledby={invitationTitleId}
+          data-state={invitationState}
+          inert={invitationState === "leaving"}
+          onMouseEnter={() => setInvitationPaused(true)}
+          onMouseLeave={(event) => setInvitationPaused(event.currentTarget.contains(document.activeElement))}
+          onFocusCapture={() => setInvitationPaused(true)}
+          onBlurCapture={(event) => {
+            if (!event.currentTarget.contains(event.relatedTarget)) {
+              setInvitationPaused(event.currentTarget.matches(":hover"));
+            }
+          }}
+          className="chatbot-invitation absolute bottom-16 right-0 w-72 max-w-[calc(100vw-3rem)] rounded-2xl rounded-br-md border border-emerald-400/30 bg-gray-950 p-5 shadow-xl shadow-black/30"
+        >
+          <span aria-hidden="true" className="absolute -bottom-1.5 right-8 h-3 w-3 rotate-45 border-b border-r border-emerald-400/30 bg-gray-950" />
+          <button
+            type="button"
+            onClick={dismissInvitation}
+            aria-label={t.chatbot.invitation.dismiss}
+            className="absolute right-2 top-2 rounded-lg p-2.5 text-gray-400 transition-colors hover:bg-gray-800 hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-400"
+          >
+            <X size={16} aria-hidden="true" />
+          </button>
+          <div className="mb-3 flex items-center gap-2 text-emerald-400">
+            <Bot size={18} aria-hidden="true" />
+            <span className="text-xs font-bold tracking-wide">{t.chatbot.title}</span>
+          </div>
+          <h2 id={invitationTitleId} className="pr-2 text-sm font-bold leading-relaxed text-white">
+            {t.chatbot.invitation.title}
+          </h2>
+          <p id={invitationTextId} className="mt-2 text-xs leading-relaxed text-gray-300" role="status">
+            <TypewriterText
+              key={t.chatbot.invitation.description}
+              text={t.chatbot.invitation.description}
+              onStart={startInvitationTyping}
+              onComplete={completeInvitationTyping}
+            />
+          </p>
+          {/* <button
+            type="button"
+            onClick={openChat}
+            className="mt-4 flex min-h-10 w-full items-center justify-center gap-2 rounded-xl bg-emerald-400/10 px-3 py-2 text-xs font-bold text-emerald-300 transition-colors hover:bg-emerald-400/20 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-400"
+          >
+            <MessageCircle size={15} aria-hidden="true" />
+            {t.chatbot.invitation.action}
+          </button> */}
+        </aside>
+      )}
       {isOpen && (
         <section
           id={panelId}
@@ -206,14 +300,18 @@ export default function Chatbot() {
       <button
           ref={triggerRef}
           type="button"
-          onClick={() => isOpen ? closeChat() : setIsOpen(true)}
+          onClick={() => isOpen ? closeChat() : openChat()}
           aria-label={isOpen ? t.chatbot.close : t.chatbot.open}
           aria-expanded={isOpen}
+          aria-describedby={invitationState === "typing" || invitationState === "visible" ? invitationTextId : undefined}
           aria-controls={isOpen ? panelId : undefined}
           aria-haspopup="dialog"
-          className="flex h-12 items-center gap-2 rounded-full bg-emerald-400 px-5 font-bold text-gray-950 shadow-lg transition-colors hover:bg-emerald-300 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-emerald-400"
+          className="chatbot-launcher relative flex h-12 items-center gap-2 rounded-full bg-emerald-400 px-5 font-bold text-gray-950 shadow-lg shadow-emerald-950/30 transition-[background-color,box-shadow,translate] duration-200 hover:-translate-y-0.5 hover:bg-emerald-300 hover:shadow-emerald-400/20 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-emerald-400 motion-reduce:hover:translate-y-0 motion-reduce:transition-none"
       >
-        <MessageCircle size={22} aria-hidden="true" />
+        {showInvitation && (
+          <span aria-hidden="true" className="chatbot-launcher-ring pointer-events-none absolute inset-0 rounded-full border-2 border-emerald-300/60" />
+        )}
+        <MessageCircle size={22} aria-hidden="true" className={showInvitation ? "chatbot-launcher-icon" : undefined} />
         {t.chatbot.title}
       </button>
     </div>

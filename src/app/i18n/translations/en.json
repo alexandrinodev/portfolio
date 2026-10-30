@@ -312,6 +312,12 @@
         "label": "Contact",
         "question": "How can I contact Alex?"
       }
-    ]
+    ],
+    "invitation": {
+      "title": "Curious about Alex?",
+      "description": "Ask about his experience, technologies and projects. Let Alex AI help you explore the portfolio.",
+      "action": "Ask Alex AI",
+      "dismiss": "Dismiss the Alex AI invitation"
+    }
   }
 }
