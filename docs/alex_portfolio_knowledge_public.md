@@ -62,6 +62,34 @@ Outros projetos pessoais estão apenas no GitHub.
 - IA aplicada: embeddings, Qdrant, busca semântica, LLMs, prompts.
 - Em estudo, sem experiência profissional: AWS, agentes de IA, MCP, LangChain, LangGraph. Machine Learning: apenas projetos pessoais simples.
 
+## Projetos e sistemas profissionais — visão pública
+
+Durante sua atuação como Software Engineer no SIDIA, Alex participou do desenvolvimento e da evolução de diferentes soluções corporativas. Os nomes internos dos projetos e os detalhes proprietários não são divulgados.
+
+### Plataforma desktop de automação de testes Android
+Aplicação Linux com Electron e Python para preparação de dispositivos, execução de testes automatizados, acompanhamento de resultados e geração de relatórios.
+
+### Serviço de validação automatizada
+Backend Python responsável por consultar sistemas externos e aplicar regras de validação. Alex contribuiu com refatoração de código legado, testes unitários, integrações REST e melhorias de manutenção.
+
+### Sistema distribuído de execução de tarefas
+Solução que utiliza mensageria com RabbitMQ e workers para distribuir tarefas entre diferentes computadores. Alex participou das decisões técnicas e da integração dos componentes.
+
+### Plataforma web de gerenciamento de testes
+Interfaces desenvolvidas com React, Next.js e TypeScript, integradas a APIs REST para acompanhamento e controle de operações.
+
+### Solução de IA para validação de imagens
+Integração de serviços backend com modelos de linguagem para processamento e validação automatizada de imagens.
+
+### Chatbot corporativo com RAG
+Alex participou da criação de um assistente para consulta a documentação interna utilizando recuperação de informações e geração de respostas em linguagem natural.
+
+### APIs e integrações backend
+Desenvolvimento e manutenção de serviços utilizando Python, Node.js e Go para integração entre aplicações e processamento de informações.
+
+As descrições acima são genéricas e não identificam sistemas internos, clientes específicos ou detalhes proprietários.
+
+
 ## Inglês
 Alex Alexandrino tem inglês B2. Já participou de apresentações em inglês e de algumas reuniões em inglês, além de leitura técnica.
 

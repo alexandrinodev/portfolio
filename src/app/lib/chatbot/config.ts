@@ -9,7 +9,7 @@ export const generationSettings = {
 
 export const retrievalSettings = {
   chunkSize: 1100,
-  chunkOverlap: 150,
+  chunkOverlap: 200,
   maxContextCharacters: 4400,
   maxPassages: 4,
   candidateCount: 8,
