@@ -1,0 +1,76 @@
+name: CI e deploy VPS
+
+on:
+  pull_request:
+    branches: [master]
+  push:
+    branches: [master]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: portfolio-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run test:chatbot
+      - run: docker build -t portfolio:${{ github.sha }} .
+      - name: Exportar imagem
+        if: github.event_name != 'pull_request' && github.ref == 'refs/heads/master'
+        run: docker save portfolio:${{ github.sha }} | gzip > /tmp/portfolio.tar.gz
+      - uses: actions/upload-artifact@v4
+        if: github.event_name != 'pull_request' && github.ref == 'refs/heads/master'
+        with:
+          name: portfolio-image
+          path: /tmp/portfolio.tar.gz
+          retention-days: 1
+
+  deploy:
+    needs: ci
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/master'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: portfolio-image
+          path: /tmp
+      - name: Configurar SSH
+        env:
+          SSH_KEY: ${{ secrets.VPS_SSH_KEY }}
+          KNOWN_HOSTS: ${{ secrets.VPS_KNOWN_HOSTS }}
+          VPS_HOST: ${{ secrets.VPS_HOST }}
+          VPS_USER: ${{ secrets.VPS_USER }}
+        run: |
+          test -n "$SSH_KEY" && test -n "$KNOWN_HOSTS"
+          test -n "$VPS_HOST" && test -n "$VPS_USER"
+          install -m 700 -d ~/.ssh
+          printf '%s\n' "$SSH_KEY" > ~/.ssh/id_ed25519
+          printf '%s\n' "$KNOWN_HOSTS" > ~/.ssh/known_hosts
+          chmod 600 ~/.ssh/id_ed25519 ~/.ssh/known_hosts
+      - name: Enviar e implantar
+        env:
+          VPS_HOST: ${{ secrets.VPS_HOST }}
+          VPS_USER: ${{ secrets.VPS_USER }}
+          VPS_PORT: ${{ secrets.VPS_PORT }}
+        run: |
+          port="${VPS_PORT:-22}"
+          target="$VPS_USER@$VPS_HOST"
+          remote="/opt/portfolio/releases/$GITHUB_SHA"
+          ssh -p "$port" -o BatchMode=yes "$target" "mkdir -p '$remote'"
+          scp -P "$port" -o BatchMode=yes /tmp/portfolio.tar.gz compose/docker-compose.yml scripts/deploy-vps.sh "$target:$remote/"
+          ssh -p "$port" -o BatchMode=yes "$target" "bash '$remote/deploy-vps.sh' '$GITHUB_SHA'"

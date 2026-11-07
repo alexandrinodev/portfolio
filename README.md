@@ -253,6 +253,12 @@ npm run inspect:rag -- "Qual a experiência de Alex com Python?"
 
 A inspeção consome cota, mostra os trechos públicos e suas pontuações e não gera uma resposta. A avaliação de qualidade e de resistência a ataques com o modelo real é uma etapa separada dos testes simulados.
 
+### Deploy automático na VPS Hostinger
+
+O projeto inclui CI/CD com GitHub Actions: pushes na `master` executam lint, testes, build Docker e deploy por SSH, com verificação de saúde e tentativa de rollback em falhas. O Nginx existente encaminha para `127.0.0.1:3000`.
+
+Veja [o guia de configuração da VPS e dos secrets](docs/DEPLOY_VPS.md) antes do primeiro push. Commits locais só disparam o fluxo quando enviados ao GitHub.
+
 ### Deploy na Vercel
 
 Cadastre as variáveis no projeto, em **Settings → Environment Variables**, para os ambientes **Production** e **Preview** que utilizar. Use os nomes da tabela acima, sem prefixo `NEXT_PUBLIC_`. Depois de cadastrar ou alterar os valores, publique um novo deployment.

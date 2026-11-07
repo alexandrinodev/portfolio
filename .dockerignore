@@ -1,0 +1,12 @@
+node_modules
+.next
+.git
+.github
+.env*
+!.env.example
+.vercel
+.vscode
+coverage
+*.log
+*.pem
+*.key
