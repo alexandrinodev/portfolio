@@ -22,6 +22,7 @@ let redisResult;
 let redisStatus;
 let streamChunks;
 let streamGate;
+let onStreamPaused;
 let geminiSignal;
 let indexCalls;
 let queryCalls;
@@ -55,6 +56,8 @@ function reset() {
   noMatch = false;
   streamChunks = undefined;
   streamGate = undefined;
+  onStreamPaused = undefined;
+  geminiSignal = undefined;
   geminiCalls = 0;
   redisCalls = 0;
   geminiStatus = 200;
@@ -98,7 +101,10 @@ globalThis.fetch = async (url, init) => {
     return new Response(new ReadableStream({ async start(controller) {
       const encoder = new TextEncoder();
       for (let index = 0; index < chunks.length; index++) {
-        if (index && gate) await gate;
+        if (index && gate) {
+          onStreamPaused?.();
+          await gate;
+        }
         controller.enqueue(encoder.encode(`data: ${JSON.stringify(chunks[index])}\n\n`));
       }
       controller.close();
@@ -237,8 +243,9 @@ test("rota do chatbot com HTTP simulado", async (t) => {
     } finally { globalThis.fetch = originalFetch; }
   });
 
-  await t.test("texto só é exibido após geração e validação completas", async () => {
+  await t.test("texto só é exibido após geração e validação completas", { timeout: 10000 }, async () => {
     reset();
+    const streamPaused = new Promise((resolve) => { onStreamPaused = resolve; });
     let release;
     streamGate = new Promise((resolve) => { release = resolve; });
     streamChunks = [
@@ -248,7 +255,7 @@ test("rota do chatbot com HTTP simulado", async (t) => {
     let responded = false;
     const pending = POST(request(validBody, { Accept: "text/event-stream" })).then((response) => { responded = true; return response; });
     // A primeira parte do provedor não libera texto ainda não validado.
-    await new Promise(setImmediate);
+    await streamPaused;
     assert.equal(responded, false);
     release();
     const response = await pending;
@@ -259,8 +266,9 @@ test("rota do chatbot com HTTP simulado", async (t) => {
     assert.deepEqual(events.at(-1), { type: "finish", finishReason: "stop" });
   });
 
-  await t.test("cancelar a requisição interrompe geração antes de exibir resposta", async () => {
+  await t.test("cancelar a requisição interrompe geração antes de exibir resposta", { timeout: 10000 }, async () => {
     reset();
+    const streamPaused = new Promise((resolve) => { onStreamPaused = resolve; });
     let release;
     streamGate = new Promise((resolve) => { release = resolve; });
     streamChunks = [
@@ -269,7 +277,10 @@ test("rota do chatbot com HTTP simulado", async (t) => {
     ];
     const controller = new AbortController();
     const pending = POST(new Request(request(validBody, { Accept: "text/event-stream" }), { signal: controller.signal }));
-    for (let index = 0; index < 100 && !geminiCalls; index++) await new Promise(setImmediate);
+    // Aguarda o provedor realmente iniciar, inclusive quando o I/O do CI é lento.
+    await streamPaused;
+    assert.equal(geminiCalls, 1);
+    assert.equal(geminiSignal.aborted, false);
     controller.abort();
     release();
     const response = await pending;
